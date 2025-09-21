@@ -143,11 +143,13 @@
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Paddle.cpp" />
+    <ClCompile Include="..\src\Vector2D.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Ball.h" />
     <ClInclude Include="..\include\Game.h" />
     <ClInclude Include="..\include\Paddle.h" />
+    <ClInclude Include="..\include\Vector2D.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
