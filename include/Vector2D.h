@@ -1,3 +1,4 @@
+#pragma once
 #include<math.h>
 class Vector2D
 {
@@ -68,4 +69,5 @@ public:
 private:
 	float xPos;
 	float yPos;
+
 };

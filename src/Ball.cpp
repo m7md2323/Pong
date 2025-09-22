@@ -1,22 +1,44 @@
-#include "/Pong/PongGame/include/Ball.h"
+#include "Ball.h"
+#include<iostream>
 
-Ball* Ball::_instance = NULL;
-
-Ball* Ball::instance()
+void Ball::update()
 {
-	if (_instance == NULL) {
-		_instance = new Ball();
+	cout << "Inside Ball Update\n";
+	position += velocity;
+}
+
+bool Ball::loadMedia(SDL_Renderer *mainRenderer,string strPath)
+{
+	SDL_Texture* ballImage = IMG_LoadTexture(mainRenderer, strPath.c_str());
+	if (ballImage == NULL) {
+		SDL_Log("SDL_Image could not Load texture ! SDL error: %s\n", SDL_GetError());
+		return false;
 	}
-	return _instance;
+	return true;
+}
+
+void Ball::render(SDL_Renderer * mainRenderer,SDL_Texture * ballTexture)
+{
+	
+	SDL_FRect sourceRect, destRect;
+	sourceRect.y = sourceRect.x = 0;
+	sourceRect.w = destRect.w =25;
+	sourceRect.h = destRect.h = 25;
+	destRect.x = position.getX();
+	destRect.y = position.getY();
+
+	//SDL_RenderClear(mainRenderer);
+	SDL_RenderTexture(mainRenderer, ballTexture, &sourceRect, &destRect);
 }
 
 void Ball::clean()
 {
 
 }
-
-Ball::Ball()
+//to be updated after (the initial position)
+Ball::Ball():position(0,0),velocity(0.5,0)
 {
+
 }
 
 Ball::~Ball()

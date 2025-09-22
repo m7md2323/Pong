@@ -1,17 +1,29 @@
 #pragma once 
 #include<SDL3/SDL.h>
-#include"/Pong/PongGame/include/Vector2D.h"
-//this class its instance is created using the singleton creational design pattern 
+#include<SDL3_image/SDL_image.h>
+#include<string>
+#include"Vector2D.h"
+using namespace std;
+
+//this class instance is created using the Meyers’ singleton creational design pattern 
 class Ball {
 public:
-	static Ball* instance();
+	static Ball& instance() {
+		static Ball instance;
+		return instance;
+	}
+	void update();
+	bool loadMedia(SDL_Renderer* mainRenderer,string strPath);
+	void render(SDL_Renderer* mainRenderer, SDL_Texture* ballTexture);
 	void clean();
 
 protected:
 	Ball();
 	~Ball();
 private:
-	static Ball* _instance;
 	Vector2D position;
+	Vector2D velocity;
+
+	//SDL_Texture* ballImage;//clean
 
 };
