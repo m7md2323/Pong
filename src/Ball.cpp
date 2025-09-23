@@ -27,7 +27,6 @@ void Ball::render(SDL_Renderer * mainRenderer,SDL_Texture * ballTexture)
 	destRect.x = position.getX();
 	destRect.y = position.getY();
 
-	//SDL_RenderClear(mainRenderer);
 	SDL_RenderTexture(mainRenderer, ballTexture, &sourceRect, &destRect);
 }
 
@@ -36,7 +35,7 @@ void Ball::clean()
 
 }
 //to be updated after (the initial position)
-Ball::Ball():position(0,0),velocity(0.5,0)
+Ball::Ball():position(1200/2,800/2),velocity(0.01,0)
 {
 
 }

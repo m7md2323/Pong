@@ -4,7 +4,12 @@
 #include"Ball.h"
 #include"Paddle.h"
 #include<iostream>
+#include<vector>
 //this class instance is created using the Meyers’ singleton creational design pattern 
+enum LineGraph {
+	DASHED_LINE_VERTICAL,
+	DASHED_LINE_HORIZANTAL
+};
 class Game {
 public:
 
@@ -19,6 +24,9 @@ public:
 	void render();
 	void clean();
 	bool loadMedia();
+
+	void renderDashedLine(int start, int end, bool VerOrHor);//1 for vertical 0 for horizontal
+	void initGraphics();
 protected:
 	Game();
 	~Game();
@@ -26,6 +34,8 @@ private:
 
 	int windowHeight;
 	int windowWidth;
+
+	int graphicsOffset;
 
 	SDL_Window* mainWindow;
 	SDL_Renderer* mainRenderer;

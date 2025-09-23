@@ -7,10 +7,13 @@ public:
 	~Paddle();
 
 	void update();
+	void render(SDL_Renderer *mainRenderer);
+	void inputHandler();
 	void clean();
 
 private:
 
 	Vector2D position;
+	SDL_FRect thePaddle;
 
 };
