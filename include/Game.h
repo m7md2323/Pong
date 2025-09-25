@@ -3,13 +3,10 @@
 #include<SDL3_image/SDL_image.h>
 #include"Ball.h"
 #include"Paddle.h"
+#include"InputHandler.h"
 #include<iostream>
 #include<vector>
 //this class instance is created using the Meyers’ singleton creational design pattern 
-enum LineGraph {
-	DASHED_LINE_VERTICAL,
-	DASHED_LINE_HORIZANTAL
-};
 class Game {
 public:
 
@@ -19,23 +16,28 @@ public:
 	}
 
 	bool init();
-	void inputHandler(bool& quit);
+	void inputHandler();
 	void update();
 	void render();
 	void clean();
 	bool loadMedia();
+	void renderLine(int start, int end,bool dashed, bool VerOrHor);//1 for vertical 0 for horizontal, 1 for dashed line 0 for not
+	bool checkCollision();
+	void renderMap();
 
-	void renderDashedLine(int start, int end, bool VerOrHor);//1 for vertical 0 for horizontal
-	void initGraphics();
 protected:
 	Game();
 	~Game();
 private:
 
+	vector<vector<vector<Uint8>>> storeImageAsMatrix(string filePath);
+
 	int windowHeight;
 	int windowWidth;
 
 	int graphicsOffset;
+
+	string ballFilePath;
 
 	SDL_Window* mainWindow;
 	SDL_Renderer* mainRenderer;
@@ -47,6 +49,6 @@ private:
 	//Game objects:
 	//2 Paddles
 	Paddle *player1, *player2;//clean
-	//and one ball
+	//and one ball (singleton instance)
 
 };

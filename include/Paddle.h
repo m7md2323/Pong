@@ -11,9 +11,13 @@ public:
 	void inputHandler();
 	void clean();
 
+	void moveUp();
+	void moveDown();
+	
+	Vector2D position;
 private:
 
-	Vector2D position;
+	
 	SDL_FRect thePaddle;
 
 };

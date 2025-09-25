@@ -17,13 +17,13 @@ public:
 	void render(SDL_Renderer* mainRenderer, SDL_Texture* ballTexture);
 	void clean();
 
+	Vector2D position;
+	Vector2D velocity;
 protected:
 	Ball();
 	~Ball();
 private:
-	Vector2D position;
-	Vector2D velocity;
-
+	//SDL_FPoint ballEdges;
 	//SDL_Texture* ballImage;//clean
 
 };

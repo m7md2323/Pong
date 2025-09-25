@@ -1,8 +1,8 @@
 #include "Game.h"
 //Game* Game::_instance = NULL;
 void Game::update() {
-	cout << "Inside Game Update\n";
 	Ball::instance().update();
+	if (checkCollision())cout << "Ball Col\n";
 }
 void Game::render()
 {
@@ -10,39 +10,16 @@ void Game::render()
 	SDL_SetRenderDrawColor(mainRenderer, 50, 50, 50, 255);
 	SDL_RenderClear(mainRenderer);
 	player1->render(mainRenderer);
-	/*SDL_FRect rect1, rect2, rect3;
-	rect1.x = rect1.y = 0;
-	rect1.w = windowWidth;
-	rect1.h = windowHeight;
-
-	rect2.x = rect2.y = 5;
-	rect2.w = windowWidth -10;
-	rect2.h = windowHeight -10;
-
-	rect3.x = 0; rect3.y = 150;
-	rect3.w = windowWidth;
-	rect3.h = windowHeight - 300;
-
-	SDL_SetRenderDrawColor(mainRenderer, 255, 255, 0, SDL_ALPHA_OPAQUE);
-	SDL_RenderFillRect(mainRenderer, &rect1);
-
-	SDL_SetRenderDrawColor(mainRenderer, 123, 321, 123, SDL_ALPHA_OPAQUE);
-	SDL_RenderFillRect(mainRenderer, &rect2);
-
-	SDL_SetRenderDrawColor(mainRenderer, 123, 321, 123, SDL_ALPHA_OPAQUE);
-	SDL_RenderFillRect(mainRenderer, &rect3);
-	SDL_SetRenderDrawColor(mainRenderer, 0, 0, 0, 255);
-	SDL_RenderLine(mainRenderer, windowWidth/2,0, windowWidth / 2, windowHeight);*/
-
+	player2->render(mainRenderer);
 	Ball::instance().render(mainRenderer,ballTexture);
-	
-	renderDashedLine(windowWidth/2, windowHeight-graphicsOffset, 1);
-	renderDashedLine(graphicsOffset, windowWidth - graphicsOffset,0);
-	renderDashedLine(windowHeight-graphicsOffset, windowWidth - graphicsOffset, 0);
+	renderMap();
 	SDL_RenderPresent(mainRenderer);
 }
 Game::Game():mainWindow{ NULL },mainRenderer{NULL},player1{NULL},player2{NULL}
 {
+	player1 = new Paddle();
+	player2 = new Paddle();
+	player2->position.setX(player1->position.getX() + 900);
 	windowWidth = 1200;
 	windowHeight = 800;
 	graphicsOffset = 43;
@@ -51,6 +28,42 @@ Game::Game():mainWindow{ NULL },mainRenderer{NULL},player1{NULL},player2{NULL}
 Game::~Game()
 {
 	clean();
+}
+
+vector<vector<vector<Uint8>>> Game::storeImageAsMatrix(string filePath)
+{
+	SDL_Surface* tempCopy = IMG_Load(filePath.c_str());
+	//creates a 3D matrix to store the pixels values RGBA
+	//A image.h X image.w X 4 3D matrix
+	vector<vector<vector<Uint8>>> imageMatrix(tempCopy->h, vector<vector<Uint8>>(tempCopy->w, vector<Uint8>(4)));
+	for (int i = 0; i < tempCopy->h; ++i) {
+		for (int j = 0; j < tempCopy->w; ++j) {
+			imageMatrix[i][j][0] = 0; // Initialize
+			imageMatrix[i][j][1] = 0;
+			imageMatrix[i][j][2] = 0;
+			imageMatrix[i][j][3] = 0;
+		}
+	}
+	SDL_LockSurface(tempCopy);
+
+	for (int i = 0; i < tempCopy->h; ++i) {
+		for (int j = 0; j < tempCopy->w; ++j) {
+			// Get the color at (x, y)
+			Uint32 pixelColor = *(Uint32*)((Uint8*)tempCopy->pixels + i * tempCopy->pitch + j * SDL_GetPixelFormatDetails(tempCopy->format)->bytes_per_pixel);
+
+			// Convert to RGBA
+			SDL_Color color;
+			SDL_GetRGBA(pixelColor, SDL_GetPixelFormatDetails(tempCopy->format), NULL, &color.r, &color.g, &color.b, &color.a);
+
+			// Store in your matrix
+			imageMatrix[i][j][0] = color.r;
+			imageMatrix[i][j][1] = color.g;
+			imageMatrix[i][j][2] = color.b;
+			imageMatrix[i][j][3] = color.a;
+		}
+	}
+	SDL_UnlockSurface(tempCopy);
+	return imageMatrix;
 }
 
 
@@ -69,33 +82,28 @@ bool Game::init()
 		SDL_Log("Window could not be created! SDL error: %s\n", SDL_GetError());
 		return false;
 	}
-	//if creating the main window went right, create main renderer
 	//and renderer is the class where you will be able to upload graphics (sprit sheets) using the GPU
 	if (mainRenderer == NULL) {
 		SDL_Log("Renderer could not be created! SDL error: %s\n", SDL_GetError());
+		return false;
 	}
-	//initialize Media
+	//initialize Media and Graphics
 	if (loadMedia() == false) {
 		SDL_Log("Media could not be loaded ! SDL error: %s\n", SDL_GetError());
+		return false;
 	}
-	//initialize graphics
-	initGraphics();
-	player1 = new Paddle();
+	//build characters
+	//player1 = new Paddle();
+	
 	// if everything went right, return true 
+	checkCollision();
 	return true;
 }
 
-void Game::inputHandler(bool &quit)
+void Game::inputHandler()
 {
-	SDL_Event event;
-	while (SDL_PollEvent(&event)) {
-		switch (event.type) {
-		case SDL_EVENT_QUIT:
-			quit = true;
-			break;
-		}
-
-	}
+	InputHandler::Instance().update(player1);
+	InputHandler::Instance().update(player2);
 }
 
 void Game::clean()
@@ -119,42 +127,84 @@ void Game::clean()
 
 bool Game::loadMedia()
 {
-	ballTexture = IMG_LoadTexture(mainRenderer, "../assets/theBall.png");
+	ballFilePath = "../assets/theBall.png";
+	ballTexture = IMG_LoadTexture(mainRenderer, ballFilePath.c_str());
 	if (ballTexture == NULL) {
 		SDL_Log("image could not be loaded!! SDL error: %s\n", SDL_GetError());
 		return false;
 	}
 }
 
-void Game::renderDashedLine(int start,int end, bool VerOrHor)
+void Game::renderMap()
 {
-	SDL_FRect rectForDashedLine;
 
-	SDL_SetRenderDrawColor(mainRenderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
+	//render vertical dashed line in the middle
+	renderLine(windowWidth / 2, windowHeight - graphicsOffset, true, true);
+	//render the upper horizontal non-dashed line 
+	renderLine(graphicsOffset, windowWidth - graphicsOffset, false, false);
+	//render the lower horizontal non-dashed line 
+	renderLine(windowHeight - graphicsOffset, windowWidth - graphicsOffset, false, false);
+}
+
+void Game::renderLine(int start,int end,bool dashed, bool VerOrHor)
+{
+	SDL_FRect rectForLine;
+
+	//the color of the line is white
+	SDL_SetRenderDrawColor(mainRenderer, 150, 150, 150, SDL_ALPHA_OPAQUE);
 	if (VerOrHor == true) {
-		//vertical dem
-		rectForDashedLine.x = start+15;
-		rectForDashedLine.y = graphicsOffset;
-		rectForDashedLine.w = 10;
-		rectForDashedLine.h = 35;
+		//vertical 
+		rectForLine.x = start;
+		rectForLine.y = graphicsOffset;
+		rectForLine.w = 15;
+		rectForLine.h = 35;
 	}
 	else {
-		rectForDashedLine.x = graphicsOffset;
-		rectForDashedLine.y = start;
-		rectForDashedLine.w = 35;
-		rectForDashedLine.h = 10;
+		//horizontal 
+		rectForLine.x = graphicsOffset;
+		rectForLine.y = start;
+		rectForLine.w = 35;
+		rectForLine.h = 15;
 	}
-	int offset = 35 + 35 / 4;
-	while(rectForDashedLine.y<=end && rectForDashedLine.x <=end){
-		SDL_RenderFillRect(mainRenderer, &rectForDashedLine);
-		if (VerOrHor)rectForDashedLine.y += offset;
-		else rectForDashedLine.x += offset;
+	//the offset for making a space between the dashes or no dashes in the case of a straight line
+	int offset;
+	if (dashed)offset = 35 + 35 / 4;
+	else offset = 35;
+	while(rectForLine.y<=end && rectForLine.x <=end){
+		SDL_RenderFillRect(mainRenderer, &rectForLine);
+		if (VerOrHor)rectForLine.y += offset;
+		else rectForLine.x += offset;
 	}
 
 }
-
-void Game::initGraphics()
+bool Game::checkCollision()
 {
-	//for the dashedLines
-	//each line is 5 width and 30 in height
+	//vector<vector<vector<Uint8>>> ballAsMatrix = storeImageAsMatrix(ballFilePath);
+	int x1Ball = Ball::instance().position.getX() + 2;
+	int y1Ball = Ball::instance().position.getY() + 1;
+	int x2Ball = Ball::instance().position.getX() + 24;
+	int y2Ball = Ball::instance().position.getY() +24;
+
+	int x1Player1 =player1->position.getX();
+	int y1Player1 =player1->position.getY();
+	int x2Player1 = player1->position.getX()+10;
+	int y2Player1 = player1->position.getY() + 100;
+
+	int x1Player2 = player2->position.getX();
+	int y1Player2 = player2->position.getY();
+	int x2Player2 = player2->position.getX()+10;
+	int y2Player2 = player2->position.getY()+100;
+
+
+	if (x1Ball <= x1Player1&& y1Ball >= y1Player1 && y1Ball <= y2Player1) {
+		Ball::instance().velocity *= -1;
+		return true;
+	}
+	if (x1Ball >= x1Player2 && y1Ball >= y1Player2 && y1Ball <= y2Player2) {
+		Ball::instance().velocity *= -1;
+		return true;
+	}
+	return false;
 }
+
+

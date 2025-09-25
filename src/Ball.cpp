@@ -3,7 +3,7 @@
 
 void Ball::update()
 {
-	cout << "Inside Ball Update\n";
+	//cout << "Inside Ball Update\n";
 	position += velocity;
 }
 
@@ -19,7 +19,7 @@ bool Ball::loadMedia(SDL_Renderer *mainRenderer,string strPath)
 
 void Ball::render(SDL_Renderer * mainRenderer,SDL_Texture * ballTexture)
 {
-	
+
 	SDL_FRect sourceRect, destRect;
 	sourceRect.y = sourceRect.x = 0;
 	sourceRect.w = destRect.w =25;
@@ -35,7 +35,7 @@ void Ball::clean()
 
 }
 //to be updated after (the initial position)
-Ball::Ball():position(1200/2,800/2),velocity(0.01,0)
+Ball::Ball():position(1200/2,800/2),velocity(-2,0)
 {
 
 }
