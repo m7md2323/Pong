@@ -18,7 +18,7 @@ bool InputHandler::isKeyDown(SDL_Scancode key)
 	}
 	return false;
 }
-void InputHandler::update(Paddle *player)
+void InputHandler::update()
 {
 	SDL_Scancode key;
 	
@@ -40,7 +40,7 @@ void InputHandler::update(Paddle *player)
 			onMouseButtonUp(event);
 			break;
 		case SDL_EVENT_KEY_DOWN:
-			onKeyDown(&event,player);
+			onKeyDown(&event);
 			break;
 		case SDL_EVENT_KEY_UP:
 			onKeyUp(&event);
@@ -50,20 +50,9 @@ void InputHandler::update(Paddle *player)
 		}
 	}
 }
-int InputHandler::onKeyDown(SDL_Event *e,Paddle *player)
+int InputHandler::onKeyDown(SDL_Event* e)
 {
-	switch (e->key.scancode)
-	{
-		case SDL_SCANCODE_W:
-			player->moveUp();
-			break;
-		case SDL_SCANCODE_S:
-			player->moveDown();
-	default:
-		break;
-	}
 	return 0;
-
 }
 
 int InputHandler::onKeyUp(SDL_Event *e)

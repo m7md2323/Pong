@@ -6,6 +6,7 @@
 #include"InputHandler.h"
 #include<iostream>
 #include<vector>
+using namespace std;
 //this class instance is created using the Meyers’ singleton creational design pattern 
 class Game {
 public:
@@ -21,8 +22,9 @@ public:
 	void render();
 	void clean();
 	bool loadMedia();
-	void renderLine(int start, int end,bool dashed, bool VerOrHor);//1 for vertical 0 for horizontal, 1 for dashed line 0 for not
-	bool checkCollision();
+	void renderLine(int start, int end,bool dashed, bool VerOrHor);
+	//1 for vertical 0 for horizontal, 1 for dashed line 0 for not
+	bool checkCollision(Paddle* p);
 	void renderMap();
 
 protected:

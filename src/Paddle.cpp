@@ -39,14 +39,14 @@ void Paddle::clean()
 
 void Paddle::moveUp()
 {
-	if (position.getY() > 50&&position.getY()<760) {
-		position.setY(position.getY() - 15.5);
+	if (position.getY()>= 58) {
+		position.setY(position.getY() - 8);
 	}
 }
 void Paddle::moveDown()
 {
-	if (position.getY() > 50 && position.getY() < 760) {
-		position.setY(position.getY() + 15.5);
+	if (position.getY() <= 655) {
+		position.setY(position.getY() + 8);
 	}
 }
 

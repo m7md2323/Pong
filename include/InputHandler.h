@@ -14,7 +14,7 @@ public:
 		static InputHandler instance;
 		return instance;
 	}
-	void update(Paddle *player);
+	void update();
 	void clean();
 	bool getMouseButtonState(int buttonNumber) { return m_mouseButtonStates[buttonNumber]; }
 
@@ -38,7 +38,7 @@ private:
 
 	const bool* m_keyState;
 
-	int onKeyDown(SDL_Event *e,Paddle *player);
+	int onKeyDown(SDL_Event *e);
 	int onKeyUp(SDL_Event *e);
 	// handle mouse events
 	void onMouseMove(SDL_Event& event);

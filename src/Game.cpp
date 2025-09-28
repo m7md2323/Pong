@@ -1,8 +1,29 @@
 #include "Game.h"
+#include<cmath>
+#include<numeric>
+#include<algorithm>
 //Game* Game::_instance = NULL;
 void Game::update() {
 	Ball::instance().update();
-	if (checkCollision())cout << "Ball Col\n";
+	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_W)) {
+		player1->moveUp();
+	}
+	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_S)) {
+		player1->moveDown();
+	}
+	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_UP)) {
+		player2->moveUp();
+	}
+	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_DOWN)) {
+		player2->moveDown();
+	}
+	checkCollision(player1);
+	checkCollision(player2);
+	// wall collision
+	if (Ball::instance().position.getY() <= 58 || Ball::instance().position.getY() + 25 >= 730) {
+		Ball::instance().velocity.setY(-1 * Ball::instance().velocity.getY());
+	}
+
 }
 void Game::render()
 {
@@ -11,8 +32,8 @@ void Game::render()
 	SDL_RenderClear(mainRenderer);
 	player1->render(mainRenderer);
 	player2->render(mainRenderer);
-	Ball::instance().render(mainRenderer,ballTexture);
 	renderMap();
+	Ball::instance().render(mainRenderer,ballTexture);
 	SDL_RenderPresent(mainRenderer);
 }
 Game::Game():mainWindow{ NULL },mainRenderer{NULL},player1{NULL},player2{NULL}
@@ -96,14 +117,12 @@ bool Game::init()
 	//player1 = new Paddle();
 	
 	// if everything went right, return true 
-	checkCollision();
 	return true;
 }
 
 void Game::inputHandler()
 {
-	InputHandler::Instance().update(player1);
-	InputHandler::Instance().update(player2);
+	InputHandler::Instance().update();
 }
 
 void Game::clean()
@@ -177,31 +196,35 @@ void Game::renderLine(int start,int end,bool dashed, bool VerOrHor)
 	}
 
 }
-bool Game::checkCollision()
+float dotProduct(Vector2D v1,Vector2D v2) {
+	return v1.getX() * v2.getX() + v1.getY() * v2.getY();
+}
+bool Game::checkCollision(Paddle *p)
 {
 	//vector<vector<vector<Uint8>>> ballAsMatrix = storeImageAsMatrix(ballFilePath);
-	int x1Ball = Ball::instance().position.getX() + 2;
-	int y1Ball = Ball::instance().position.getY() + 1;
-	int x2Ball = Ball::instance().position.getX() + 24;
-	int y2Ball = Ball::instance().position.getY() +24;
+	//ball collision
+	float px1 = p->position.getX();
+	float py1 = p->position.getY();
+	float px2 = p->position.getX()+10;
+	float py2 = p->position.getY() + 100;
 
-	int x1Player1 =player1->position.getX();
-	int y1Player1 =player1->position.getY();
-	int x2Player1 = player1->position.getX()+10;
-	int y2Player1 = player1->position.getY() + 100;
+	float cx = Ball::instance().position.getX() +25/ 2.0f;
+	float cy = Ball::instance().position.getY() +25 / 2.0f;
+	float r = 25 / 2.0f;
 
-	int x1Player2 = player2->position.getX();
-	int y1Player2 = player2->position.getY();
-	int x2Player2 = player2->position.getX()+10;
-	int y2Player2 = player2->position.getY()+100;
+	float closestX = clamp(cx, px1, px2);
+	float closestY = clamp(cy, py1, py2);
 
+	float dx = cx - closestX;
+	float dy = cy - closestY;
 
-	if (x1Ball <= x1Player1&& y1Ball >= y1Player1 && y1Ball <= y2Player1) {
-		Ball::instance().velocity *= -1;
-		return true;
-	}
-	if (x1Ball >= x1Player2 && y1Ball >= y1Player2 && y1Ball <= y2Player2) {
-		Ball::instance().velocity *= -1;
+	Vector2D N(dx, dy);
+	Vector2D *V = &Ball::instance().velocity;
+	N.normalize();
+	//v' = v - (1 + e) * (v · n) * n
+	// dx,dy from closest point to center
+	if (dx * dx + dy * dy <= r * r) {
+		*V = *V - N*2 * dotProduct(N, *V);
 		return true;
 	}
 	return false;

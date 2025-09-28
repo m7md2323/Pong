@@ -35,7 +35,7 @@ void Ball::clean()
 
 }
 //to be updated after (the initial position)
-Ball::Ball():position(1200/2,800/2),velocity(-2,0)
+Ball::Ball():position(1200/2,800/2),velocity(-6,0)
 {
 
 }
