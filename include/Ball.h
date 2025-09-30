@@ -17,12 +17,19 @@ public:
 	void render(SDL_Renderer* mainRenderer, SDL_Texture* ballTexture);
 	void clean();
 
+	float getCenterX() { return position.getX() + width / 2.0f; }
+	float getCenterY() { return position.getY() + height / 2.0f; }
+	float getRadis(){return width / 2.0f; }
+
 	Vector2D position;
 	Vector2D velocity;
 protected:
 	Ball();
 	~Ball();
 private:
+
+	float width = 25;
+	float height = 25;
 	//SDL_FPoint ballEdges;
 	//SDL_Texture* ballImage;//clean
 

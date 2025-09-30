@@ -14,6 +14,12 @@ public:
 	//length 
 	float length() { return sqrt(xPos * xPos + yPos * yPos); }
 	//addition using operator overloading
+	Vector2D& operator+=(float scalar)
+	{
+		xPos += scalar;
+		yPos += scalar;
+		return *this;
+	}
 	Vector2D operator+(const Vector2D& v2) const
 	{
 		return Vector2D(xPos + v2.xPos, yPos + v2.yPos);

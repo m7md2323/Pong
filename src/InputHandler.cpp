@@ -34,10 +34,10 @@ void InputHandler::update()
 			onMouseMove(event);
 			break;
 		case SDL_EVENT_MOUSE_BUTTON_DOWN:
-			onMouseButtonDown(event);
+			//onMouseButtonDown(event);
 			break;
 		case SDL_EVENT_MOUSE_BUTTON_UP:
-			onMouseButtonUp(event);
+			//onMouseButtonUp(event);
 			break;
 		case SDL_EVENT_KEY_DOWN:
 			onKeyDown(&event);

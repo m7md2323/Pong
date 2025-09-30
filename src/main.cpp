@@ -2,13 +2,13 @@
 #include<SDL3/SDL.h>
 #include"Game.h"
 using namespace std;
-const int TARGET_FPS = 60;
+const int TARGET_FPS = 100;
 const int FRAME_DELAY_MS = 1000 / TARGET_FPS;
 
 Uint32 frameStart;
 int frameTime;
 int main() {
-	if (Game::instance().init() == false) {
+	if (Game::instance().init(1200,800) == false) {
 		cout << "SDL could not be init\n";
 		return 0;
 	}

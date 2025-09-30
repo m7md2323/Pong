@@ -6,6 +6,12 @@
 #include"InputHandler.h"
 #include<iostream>
 #include<vector>
+#include<cmath>
+#include<numeric>
+#include<algorithm>
+#include <random>
+#include<chrono>
+#include<numbers>
 using namespace std;
 //this class instance is created using the Meyers’ singleton creational design pattern 
 class Game {
@@ -16,23 +22,26 @@ public:
 		return instance;
 	}
 
-	bool init();
+	bool init(int windowWidth, int windowHeight);
 	void inputHandler();
 	void update();
 	void render();
 	void clean();
 	bool loadMedia();
-	void renderLine(int start, int end,bool dashed, bool VerOrHor);
-	//1 for vertical 0 for horizontal, 1 for dashed line 0 for not
+	void renderLine(int start, int end,int width,int height,bool dashed, bool VerOrHor);//1 for vertical 0 for horizontal, 1 for dashed line 0 for not
+
 	bool checkCollision(Paddle* p);
 	void renderMap();
 
+	void initSpeedForPaddleAndBall();
+	void reRenderBall();
 protected:
 	Game();
 	~Game();
 private:
 
 	vector<vector<vector<Uint8>>> storeImageAsMatrix(string filePath);
+	float speed;
 
 	int windowHeight;
 	int windowWidth;

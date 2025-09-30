@@ -5,6 +5,7 @@ void Ball::update()
 {
 	//cout << "Inside Ball Update\n";
 	position += velocity;
+	//velocity +=(velocity.length() * 0.04f);
 }
 
 bool Ball::loadMedia(SDL_Renderer *mainRenderer,string strPath)

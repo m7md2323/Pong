@@ -1,7 +1,7 @@
 #include "Paddle.h"
 
 //to be updated after (the initial position)
-Paddle::Paddle():position(141,400)
+Paddle::Paddle(float width,float height):position(50,400),width{width},height{height}
 {
 
 }
@@ -20,10 +20,11 @@ void Paddle::update()
 
 void Paddle::render(SDL_Renderer* mainRenderer)
 {
+	SDL_FRect thePaddle;
 	thePaddle.x = position.getX();
 	thePaddle.y = position.getY();
-	thePaddle.w =10;
-	thePaddle.h = 100;
+	thePaddle.w =width;
+	thePaddle.h = height;
 	SDL_SetRenderDrawColor(mainRenderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 	SDL_RenderFillRect(mainRenderer, &thePaddle);
 }
@@ -45,7 +46,7 @@ void Paddle::moveUp()
 }
 void Paddle::moveDown()
 {
-	if (position.getY() <= 655) {
+	if (position.getY()+height <= 754) {
 		position.setY(position.getY() + 8);
 	}
 }

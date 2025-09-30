@@ -3,7 +3,7 @@
 #include"Vector2D.h"
 class Paddle {
 public:
-	Paddle();
+	Paddle(float width,float height);
 	~Paddle();
 
 	void update();
@@ -14,10 +14,12 @@ public:
 	void moveUp();
 	void moveDown();
 	
+	float getWidth() { return width;};
+	float getHeight() { return height; };
 	Vector2D position;
 private:
 
-	
-	SDL_FRect thePaddle;
+	float width;
+	float height;
 
 };
