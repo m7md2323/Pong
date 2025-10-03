@@ -23,6 +23,8 @@ public:
 
 	Vector2D position;
 	Vector2D velocity;
+
+	void speedUp(float factor, float maxSpeed);
 protected:
 	Ball();
 	~Ball();

@@ -33,8 +33,10 @@ public:
 	bool checkCollision(Paddle* p);
 	void renderMap();
 
-	void initSpeedForPaddleAndBall();
-	void reRenderBall();
+	void initSpeedForBall();
+	void renderScore();
+	void updateScore();
+
 protected:
 	Game();
 	~Game();
@@ -47,6 +49,8 @@ private:
 	int windowWidth;
 
 	int graphicsOffset;
+	int leftPlayerScore;
+	int rightPlayerScore;
 
 	string ballFilePath;
 
@@ -55,11 +59,10 @@ private:
 
 	//Game textures
 	SDL_Texture* ballTexture;
-	SDL_Texture* player1Texture;
-	SDL_Texture* player2Texture;
+	SDL_Texture* scoreTexture;
 	//Game objects:
 	//2 Paddles
-	Paddle *player1, *player2;//clean
+	Paddle *leftPlayer, *rightPlayer;//clean
 	//and one ball (singleton instance)
 
 };

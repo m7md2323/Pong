@@ -3,30 +3,27 @@
 void Game::update() {
 	Ball::instance().update();
 	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_W)) {
-		player1->moveUp();
+		leftPlayer->moveUp();
 	}
 	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_S)) {
-		player1->moveDown();
+		leftPlayer->moveDown();
 	}
 	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_UP)) {
-		player2->moveUp();
+		rightPlayer->moveUp();
 	}
 	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_DOWN)) {
-		player2->moveDown();
+		rightPlayer->moveDown();
 	}
-	if (checkCollision(player1) || checkCollision(player2)) { Ball::instance().velocity += 0.04; }
+	if (checkCollision(leftPlayer) ||
+		checkCollision(rightPlayer)) {
+		Ball::instance().speedUp(1.05f, 9);
+	}
 	// wall collision
 	if (Ball::instance().position.getY() <= 58 || Ball::instance().position.getY() + 25 >= 754) {
 		Ball::instance().velocity.setY(-1 * Ball::instance().velocity.getY());
 	}
-	int ballX = Ball::instance().position.getX();
-	int ballY = Ball::instance().position.getY();
-	if (ballX+27 < 0||ballX-25>windowWidth || ballY < 0||ballY>windowHeight) {
-		for(int i=0;i<=10e4;i++){}
-		Ball::instance().position = Vector2D(windowWidth / 2, windowHeight / 2);
-		initSpeedForPaddleAndBall();
-	}
-	//initSpeedForPaddleAndBall();
+
+	updateScore();
 }
 
 void Game::render()
@@ -34,18 +31,21 @@ void Game::render()
 
 	SDL_SetRenderDrawColor(mainRenderer, 50, 50, 50, 255);
 	SDL_RenderClear(mainRenderer);
-	player1->render(mainRenderer);
-	player2->render(mainRenderer);
+	leftPlayer->render(mainRenderer);
+	rightPlayer->render(mainRenderer);
 	renderMap();
 	Ball::instance().render(mainRenderer,ballTexture);
+	renderScore();
 	SDL_RenderPresent(mainRenderer);
 }
-Game::Game():mainWindow{ NULL },mainRenderer{NULL},player1{NULL},player2{NULL}
+Game::Game():mainWindow{ NULL },mainRenderer{NULL},ballTexture{NULL},scoreTexture{NULL}, leftPlayer{NULL}, rightPlayer{NULL}
 {
-	player1 = new Paddle(8,80);
-	player2 = new Paddle(8,80);
-	player2->position.setX(player1->position.getX() + 900);
+	leftPlayer = new Paddle(8,80);
+	rightPlayer = new Paddle(8,80);
+	rightPlayer->position.setX(rightPlayer->position.getX() + 1000);
 	graphicsOffset = 43;
+	rightPlayerScore = 0;
+	leftPlayerScore = 0;
 	speed = 6;
 }
 
@@ -119,7 +119,7 @@ bool Game::init(int _windowWidth, int _windowHeight)
 	}
 	//build characters
 	//player1 = new Paddle();
-	initSpeedForPaddleAndBall();
+	initSpeedForBall();
 	// if everything went right, return true 
 	return true;
 }
@@ -129,33 +129,24 @@ void Game::inputHandler()
 	InputHandler::Instance().update();
 }
 
-void Game::clean()
-{
-	//to avoid memory leaks
 
-	SDL_DestroyWindow(mainWindow);
-	SDL_DestroyRenderer(mainRenderer);
-	player1->clean();
-	player2->clean();
-	//delete _instance;
-	delete player1;
-	delete player2;
-	//to avoid dangling pointers
-	player1 = NULL;
-	player2 = NULL;
-	mainRenderer = NULL;
-	mainWindow = NULL;
-	//_instance = NULL;
-}
 
 bool Game::loadMedia()
 {
 	ballFilePath = "../assets/theBall.png";
+	string scoreFilePath = "../assets/0To9_Score(1).png";
+
 	ballTexture = IMG_LoadTexture(mainRenderer, ballFilePath.c_str());
 	if (ballTexture == NULL) {
 		SDL_Log("image could not be loaded!! SDL error: %s\n", SDL_GetError());
 		return false;
 	}
+	scoreTexture = IMG_LoadTexture(mainRenderer, scoreFilePath.c_str());
+	if (scoreTexture == NULL) {
+		SDL_Log("image could not be loaded!! SDL error: %s\n", SDL_GetError());
+		return false;
+	}
+	return true;
 }
 
 void Game::renderMap()
@@ -169,29 +160,79 @@ void Game::renderMap()
 	renderLine(windowHeight - graphicsOffset, windowWidth - graphicsOffset,35,15, false, false);
 }
 
-void Game::initSpeedForPaddleAndBall()
+void Game::initSpeedForBall()
 {
 	/*random_device rd;*/
 	// Non-deterministic random number generator
 	//std::mt19937 gen(rd()); // Seed with random_device
 	// Alternatively, for reproducible sequences or if random_device is not available:
 	mt19937 gen(chrono::high_resolution_clock::now().time_since_epoch().count());
-	uniform_int_distribution<> distrib(-20.0f, 20.0f); // Numbers between -45.0 and 45.0 (inclusive)
+	uniform_int_distribution<> distrib(-30.0f, 30.0f); // Numbers between -30.0 and 30.0 (inclusive)
 	float randomNumber = distrib(gen);
 	float angle = randomNumber*numbers::pi / 180.0f;
 
 	int dir = rand() % 2 == 0 ? 1 : -1;
 	Vector2D velocity(dir * speed * cos(angle), speed * sin(angle));
-	//Vector2D velocity(0,0);
-	//srand(static_cast<unsigned int>(time(nullptr)));
-	//int x = rand() % 2 == 0 ? -1 : 1;
-	//int y = rand() % 2 == 0 ? -1 : 1;
-	//float diag = 6 / sqrt(2.0f);
-	//Vector2D velocity(x*diag,y*diag);
 	Ball::instance().velocity = velocity;
 
-	//cout<<angle<<"\n";
 }
+
+void Game::renderScore()
+{
+	//left player score
+	SDL_FRect sourceRect, destRect;
+
+	sourceRect.x = (scoreTexture->w / 10) * leftPlayerScore;
+	sourceRect.y = 0;
+	sourceRect.w = scoreTexture->w/10;
+	sourceRect.h = scoreTexture->h;
+
+	destRect.x = 500;
+	destRect.y = 100;
+	destRect.w = sourceRect.w;
+	destRect.h = sourceRect.h;
+
+	SDL_RenderTexture(mainRenderer, scoreTexture, &sourceRect, &destRect);
+	//right player score
+	sourceRect.x = (scoreTexture->w / 10) * rightPlayerScore;
+	sourceRect.y = 0;
+	sourceRect.w = scoreTexture->w / 10;
+	sourceRect.h = scoreTexture->h;
+
+	destRect.x = 700;
+	destRect.y = 100;
+	destRect.w = sourceRect.w;
+	destRect.h = sourceRect.h;
+
+	SDL_RenderTexture(mainRenderer, scoreTexture, &sourceRect, &destRect);
+}
+
+void Game::updateScore()
+{
+	int ballX = Ball::instance().position.getX();
+	int ballY = Ball::instance().position.getY();
+
+	bool leftSideGoal = ballX + 25 < 0;
+	bool rightSideGoal =ballX>windowWidth;
+	
+	if (leftSideGoal || rightSideGoal) {
+		if (leftSideGoal) {
+			rightPlayerScore++;
+		}
+		if (rightSideGoal) {
+			leftPlayerScore++;
+		}
+		Ball::instance().position = Vector2D(windowWidth / 2, windowHeight / 2);
+		initSpeedForBall();
+	}
+	//cout << leftPlayerScore << " " << rightPlayerScore << "\n";
+	//Ball::instance().position = Vector2D(windowHeight / 2, windowHeight / 2);
+	//updateScore();
+	//update score on screen
+
+
+}
+
 
 void Game::renderLine(int start,int end,int width,int height,bool dashed, bool VerOrHor)
 {
@@ -252,24 +293,50 @@ bool Game::checkCollision(Paddle *p)
 	//v' = v - (1 + e) * (v · n) * n
 	// dx,dy from closest point to center
 	if (dx * dx + dy * dy <= r * r) {
-		/*float paddleCenterY = p->position.getY() + p->getHeight() / 2.0f;
-		float ballCenterY = Ball::instance().position.getY();
-		float offset = (ballCenterY - paddleCenterY);
-		// offset = -1 (top), 0 (center), 1 (bottom)
-		Vector2D *velocity = &Ball::instance().velocity;
-		if (offset == 0) {
-			velocity->setX(-1*velocity->getX());
+		//speedUpBall();
+		Vector2D N(dx, dy);
+		float dist = sqrtf(dx * dx + dy * dy);
+
+		if (dist == 0) {
+			// Edge case: ball center exactly at closest point
+			N = Vector2D(1, 0);
+			dist = 1;
 		}
 		else {
-			//*velocity *= -1;
-			velocity->setX(-1 * velocity->getX());
-		}*/
-		//initSpeedForPaddleAndBall();
-		//if()
-		*V = *V - N*2 * dotProduct(N, *V);
+			N /= dist; // normalize
+		}
+
+		// Move ball out of collision
+		float penetration = r - dist;
+		Ball::instance().position += N * penetration;
+
+		// Reflect velocity
+		Vector2D* V = &Ball::instance().velocity;
+		float e = 1.0f;
+		*V = *V - N * (1 + e) * dotProduct(N, *V);
+
 		return true;
 	}
 	return false;
 }
 
-
+void Game::clean()
+{
+	//to avoid memory leaks
+	
+	SDL_DestroyWindow(mainWindow);
+	SDL_DestroyRenderer(mainRenderer);
+	SDL_DestroyTexture(ballTexture);
+	
+	leftPlayer->clean();
+	rightPlayer->clean();
+	delete leftPlayer;
+	delete rightPlayer;
+	//to avoid dangling pointers
+	leftPlayer = NULL;
+	rightPlayer = NULL;
+	ballTexture = NULL;
+	mainRenderer = NULL;
+	mainWindow = NULL;
+	cout << "cleaned\n";
+}

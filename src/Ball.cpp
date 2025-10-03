@@ -30,6 +30,18 @@ void Ball::render(SDL_Renderer * mainRenderer,SDL_Texture * ballTexture)
 
 	SDL_RenderTexture(mainRenderer, ballTexture, &sourceRect, &destRect);
 }
+void Ball::speedUp(float factor, float maxSpeed)
+{
+	float currentSpeed = velocity.length();
+	if (currentSpeed < maxSpeed)
+	{
+		// normalize velocity (direction stays the same)
+		Vector2D direction = velocity;
+		direction.normalize();
+		// scale it up
+		velocity = direction * (currentSpeed * factor);
+	}
+}
 
 void Ball::clean()
 {
