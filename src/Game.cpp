@@ -19,7 +19,7 @@ void Game::update() {
 		Ball::instance().speedUp(1.05f, 9);
 	}
 	// wall collision
-	if (Ball::instance().position.getY() <= 58 || Ball::instance().position.getY() + 25 >= 754) {
+	if (Ball::instance().position.getY() <= 15 || Ball::instance().position.getY() + 25 >= 800-15) {
 		Ball::instance().velocity.setY(-1 * Ball::instance().velocity.getY());
 	}
 
@@ -28,25 +28,28 @@ void Game::update() {
 
 void Game::render()
 {
+	SDL_SetRenderDrawColor(GraphicsHandler::instance().getRenderer(), 50, 50, 50, 255);
+	SDL_RenderClear(GraphicsHandler::instance().getRenderer());
 
-	SDL_SetRenderDrawColor(mainRenderer, 50, 50, 50, 255);
-	SDL_RenderClear(mainRenderer);
-	leftPlayer->render(mainRenderer);
-	rightPlayer->render(mainRenderer);
-	renderMap();
-	Ball::instance().render(mainRenderer,ballTexture);
-	renderScore();
-	SDL_RenderPresent(mainRenderer);
+	leftPlayer->render(GraphicsHandler::instance().getRenderer());
+	rightPlayer->render(GraphicsHandler::instance().getRenderer());
+
+	GraphicsHandler::instance().renderClassicMap();
+	//Ball::instance().render(GraphicsHandler::instance().getRenderer());
+	GraphicsHandler::instance().renderScore(leftPlayerScore, 0);
+	GraphicsHandler::instance().renderScore(rightPlayerScore, 1);
+
+	SDL_RenderPresent(GraphicsHandler::instance().getRenderer());
 }
-Game::Game():mainWindow{ NULL },mainRenderer{NULL},ballTexture{NULL},scoreTexture{NULL}, leftPlayer{NULL}, rightPlayer{NULL}
+Game::Game():leftPlayer{NULL}, rightPlayer{NULL}
 {
-	leftPlayer = new Paddle(8,80);
-	rightPlayer = new Paddle(8,80);
-	rightPlayer->position.setX(rightPlayer->position.getX() + 1000);
+	leftPlayer = new Paddle(20,80,40, GraphicsHandler::instance().getWindowHeight()/2);
+	rightPlayer = new Paddle(20,80, 1000, GraphicsHandler::instance().getWindowHeight() / 2);
+	//rightPlayer->position.setX(rightPlayer->position.getX() + 1000);
 	graphicsOffset = 43;
 	rightPlayerScore = 0;
 	leftPlayerScore = 0;
-	speed = 6;
+	speed = 1;
 }
 
 Game::~Game()
@@ -91,29 +94,11 @@ vector<vector<vector<Uint8>>> Game::storeImageAsMatrix(string filePath)
 }
 
 
-bool Game::init(int _windowWidth, int _windowHeight)
+bool Game::init()
 {
-	this->windowWidth = _windowWidth;
-	this->windowHeight = _windowHeight;
-	//initialize the SDL library
-	if (SDL_InitSubSystem(SDL_INIT_VIDEO) == false) {
-		SDL_Log("SDL could not initialize! SDL error: %s\n", SDL_GetError());
-		return false;
-	}
-	
-	//if initialization went right, create main window and create renderer
-	SDL_CreateWindowAndRenderer("Pong Game", windowWidth, windowHeight, NULL,&mainWindow,&mainRenderer);
-	if (mainWindow == NULL) {
-		SDL_Log("Window could not be created! SDL error: %s\n", SDL_GetError());
-		return false;
-	}
-	//and renderer is the class where you will be able to upload graphics (sprit sheets) using the GPU
-	if (mainRenderer == NULL) {
-		SDL_Log("Renderer could not be created! SDL error: %s\n", SDL_GetError());
-		return false;
-	}
+	GraphicsHandler::instance().init(1200,800);
 	//initialize Media and Graphics
-	if (loadMedia() == false) {
+	if (GraphicsHandler::instance().loadMedia() == false) {
 		SDL_Log("Media could not be loaded ! SDL error: %s\n", SDL_GetError());
 		return false;
 	}
@@ -129,36 +114,6 @@ void Game::inputHandler()
 	InputHandler::Instance().update();
 }
 
-
-
-bool Game::loadMedia()
-{
-	ballFilePath = "../assets/theBall.png";
-	string scoreFilePath = "../assets/0To9_Score(1).png";
-
-	ballTexture = IMG_LoadTexture(mainRenderer, ballFilePath.c_str());
-	if (ballTexture == NULL) {
-		SDL_Log("image could not be loaded!! SDL error: %s\n", SDL_GetError());
-		return false;
-	}
-	scoreTexture = IMG_LoadTexture(mainRenderer, scoreFilePath.c_str());
-	if (scoreTexture == NULL) {
-		SDL_Log("image could not be loaded!! SDL error: %s\n", SDL_GetError());
-		return false;
-	}
-	return true;
-}
-
-void Game::renderMap()
-{
-
-	//render vertical dashed line in the middle
-	renderLine(windowWidth / 2, windowHeight - graphicsOffset, 5,35,true, true);
-	//render the upper horizontal non-dashed line 
-	renderLine(graphicsOffset, windowWidth - graphicsOffset,35,15, false, false);
-	//render the lower horizontal non-dashed line 
-	renderLine(windowHeight - graphicsOffset, windowWidth - graphicsOffset,35,15, false, false);
-}
 
 void Game::initSpeedForBall()
 {
@@ -176,44 +131,14 @@ void Game::initSpeedForBall()
 	Ball::instance().velocity = velocity;
 
 }
-
-void Game::renderScore()
-{
-	//left player score
-	SDL_FRect sourceRect, destRect;
-
-	sourceRect.x = (scoreTexture->w / 10) * leftPlayerScore;
-	sourceRect.y = 0;
-	sourceRect.w = scoreTexture->w/10;
-	sourceRect.h = scoreTexture->h;
-
-	destRect.x = 500;
-	destRect.y = 100;
-	destRect.w = sourceRect.w;
-	destRect.h = sourceRect.h;
-
-	SDL_RenderTexture(mainRenderer, scoreTexture, &sourceRect, &destRect);
-	//right player score
-	sourceRect.x = (scoreTexture->w / 10) * rightPlayerScore;
-	sourceRect.y = 0;
-	sourceRect.w = scoreTexture->w / 10;
-	sourceRect.h = scoreTexture->h;
-
-	destRect.x = 700;
-	destRect.y = 100;
-	destRect.w = sourceRect.w;
-	destRect.h = sourceRect.h;
-
-	SDL_RenderTexture(mainRenderer, scoreTexture, &sourceRect, &destRect);
-}
-
+/**/
 void Game::updateScore()
 {
 	int ballX = Ball::instance().position.getX();
 	int ballY = Ball::instance().position.getY();
 
 	bool leftSideGoal = ballX + 25 < 0;
-	bool rightSideGoal =ballX>windowWidth;
+	bool rightSideGoal =ballX>GraphicsHandler::instance().getWindowWidth();
 	
 	if (leftSideGoal || rightSideGoal) {
 		if (leftSideGoal) {
@@ -222,7 +147,7 @@ void Game::updateScore()
 		if (rightSideGoal) {
 			leftPlayerScore++;
 		}
-		Ball::instance().position = Vector2D(windowWidth / 2, windowHeight / 2);
+		Ball::instance().position = Vector2D(GraphicsHandler::instance().getWindowWidth() / 2, GraphicsHandler::instance().getWindowHeight() / 2);
 		initSpeedForBall();
 	}
 	//cout << leftPlayerScore << " " << rightPlayerScore << "\n";
@@ -232,39 +157,6 @@ void Game::updateScore()
 
 
 }
-
-
-void Game::renderLine(int start,int end,int width,int height,bool dashed, bool VerOrHor)
-{
-	SDL_FRect rectForLine;
-
-	//the color of the line is white
-	SDL_SetRenderDrawColor(mainRenderer, 150, 150, 150, SDL_ALPHA_OPAQUE);
-	if (VerOrHor == true) {
-		//vertical 
-		rectForLine.x = start;
-		rectForLine.y = graphicsOffset;
-		rectForLine.w = width;
-		rectForLine.h = height;
-	}
-	else {
-		//horizontal 
-		rectForLine.x = graphicsOffset;
-		rectForLine.y = start;
-		rectForLine.w = width;
-		rectForLine.h = height;
-	}
-	//the offset for making a space between the dashes or no dashes in the case of a straight line
-	int offset;
-	if (dashed)offset = height + height / 4;
-	else offset = height;
-	while(rectForLine.y<=end && rectForLine.x <=end){
-		SDL_RenderFillRect(mainRenderer, &rectForLine);
-		if (VerOrHor)rectForLine.y += offset;
-		else rectForLine.x += offset;
-	}
-
-}
 float dotProduct(Vector2D v1,Vector2D v2) {
 	return v1.getX() * v2.getX() + v1.getY() * v2.getY();
 }
@@ -272,12 +164,36 @@ bool Game::checkCollision(Paddle *p)
 {
 	//vector<vector<vector<Uint8>>> ballAsMatrix = storeImageAsMatrix(ballFilePath);
 	//ball collision
+	//paddle
 	float px1 = p->position.getX();
 	float py1 = p->position.getY();
 	float px2 = p->position.getX()+p->getWidth();
 	float py2 = p->position.getY()+p->getHeight();
+	//ball
+	float bx1 = Ball::instance().position.getX();
+	float by1 = Ball::instance().position.getY();
+	float bx2 = Ball::instance().position.getX() + 25;
+	float by2 = Ball::instance().position.getY() + 25;
 
-	float cx = Ball::instance().getCenterX();
+	//Vector2D N(, dy);
+	//Vector2D* V = &Ball::instance().velocity;
+	//N.normalize();
+	if ((bx1 <= px2 && bx1 >= px1 || bx2 >= px1 && bx2 <= px2) && by1 >= py1 && by2 <= py2) {
+		Ball::instance().velocity.setX(-1*Ball::instance().velocity.getX());
+		return true;
+	}
+
+
+
+
+
+
+
+
+
+
+
+	/*float cx = Ball::instance().getCenterX();
 	float cy = Ball::instance().getCenterY();
 	float r = Ball::instance().getRadis();
 
@@ -316,18 +232,13 @@ bool Game::checkCollision(Paddle *p)
 		*V = *V - N * (1 + e) * dotProduct(N, *V);
 
 		return true;
-	}
+	}*/
 	return false;
 }
 
 void Game::clean()
 {
 	//to avoid memory leaks
-	
-	SDL_DestroyWindow(mainWindow);
-	SDL_DestroyRenderer(mainRenderer);
-	SDL_DestroyTexture(ballTexture);
-	
 	leftPlayer->clean();
 	rightPlayer->clean();
 	delete leftPlayer;
@@ -335,8 +246,5 @@ void Game::clean()
 	//to avoid dangling pointers
 	leftPlayer = NULL;
 	rightPlayer = NULL;
-	ballTexture = NULL;
-	mainRenderer = NULL;
-	mainWindow = NULL;
-	cout << "cleaned\n";
+	cout << "cleaned game\n";
 }

@@ -149,6 +149,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\Ball.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
+    <ClCompile Include="..\src\GraphicsHandler.cpp" />
     <ClCompile Include="..\src\InputHandler.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Paddle.cpp" />
@@ -157,6 +158,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\Ball.h" />
     <ClInclude Include="..\include\Game.h" />
+    <ClInclude Include="..\include\GraphicsHandler.h" />
     <ClInclude Include="..\include\InputHandler.h" />
     <ClInclude Include="..\include\Paddle.h" />
     <ClInclude Include="..\include\Vector2D.h" />

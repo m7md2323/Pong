@@ -1,7 +1,7 @@
 #include "Paddle.h"
 
 //to be updated after (the initial position)
-Paddle::Paddle(float width,float height):position(50,400),width{width},height{height}
+Paddle::Paddle(float width,float height,int x,int y):position(x,y),width{width},height{height},score{0}
 {
 
 }
@@ -41,13 +41,13 @@ void Paddle::clean()
 void Paddle::moveUp()
 {
 	if (position.getY()>= 58) {
-		position.setY(position.getY() - 8);
+		position.setY(position.getY() - 3);
 	}
 }
 void Paddle::moveDown()
 {
 	if (position.getY()+height <= 754) {
-		position.setY(position.getY() + 8);
+		position.setY(position.getY() + 3);
 	}
 }
 

@@ -3,7 +3,7 @@
 #include"Vector2D.h"
 class Paddle {
 public:
-	Paddle(float width,float height);
+	Paddle(float width,float height,int x,int y);
 	~Paddle();
 
 	void update();
@@ -21,5 +21,7 @@ private:
 
 	float width;
 	float height;
+
+	int score;
 
 };

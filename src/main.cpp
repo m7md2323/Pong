@@ -8,7 +8,7 @@ Uint32 frameStart;
 int frameTime;
 
 int main() {
-	if (Game::instance().init(1200,800) == false) {
+	if (Game::instance().init() == false) {
 		cout << "SDL could not be init\n";
 		return 0;
 	}
@@ -21,7 +21,7 @@ int main() {
 
 		frameTime = SDL_GetTicks() - frameStart;
 		if (FRAME_DELAY_MS > frameTime) {
-			SDL_Delay(FRAME_DELAY_MS - frameTime); // Delay if frame rendered too fast
+			//SDL_Delay(FRAME_DELAY_MS - frameTime); // Delay if frame rendered too fast
 		}
 	}
 	//Game::instance().clean();
