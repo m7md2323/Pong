@@ -7,7 +7,7 @@ public:
 	~Paddle();
 
 	void update();
-	void render(SDL_Renderer *mainRenderer);
+	void render(SDL_Renderer *mainRenderer,bool mode);
 	void inputHandler();
 	void clean();
 

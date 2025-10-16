@@ -100,8 +100,9 @@ void InputHandler::onMouseButtonUp(SDL_Event& event)
 }
 void InputHandler::clean() {
 	delete m_mousePosition;
-	delete m_keyState;
 
 	m_mousePosition = nullptr;
 	m_keyState = nullptr;
+
+	cout << "InputHandler Cleaned\n";
 }

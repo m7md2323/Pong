@@ -27,7 +27,7 @@ private:
 	InputHandler() :m_mousePosition{ nullptr }, m_keyState{nullptr}{
 		m_mousePosition = new Vector2D(0, 0);
 	}
-	~InputHandler() {}
+	~InputHandler() { clean();}
 
 	vector<vector<bool>> m_buttonStates;
 	vector<bool> m_mouseButtonStates;

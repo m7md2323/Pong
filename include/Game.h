@@ -36,6 +36,8 @@ public:
 	//void renderScore(int score,bool player);//left 0 right 1
 	void updateScore();
 
+	void mainMenu();
+
 protected:
 	Game();
 	~Game();
@@ -43,6 +45,8 @@ private:
 
 	vector<vector<vector<Uint8>>> storeImageAsMatrix(string filePath);
 	float speed;
+
+	bool collision=false;
 
 	int graphicsOffset;
 	int leftPlayerScore;

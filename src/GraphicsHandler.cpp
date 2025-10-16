@@ -35,10 +35,10 @@ void GraphicsHandler::renderScore(int score,bool player)
 	//left player score
 	SDL_FRect sourceRect, destRect;
 
-	sourceRect.x = (scoreTexture->w / 10) * score;
+	sourceRect.x = (id_texture["score"]->w / 10) * score;
 	sourceRect.y = 0;
-	sourceRect.w = scoreTexture->w / 10;
-	sourceRect.h = scoreTexture->h;
+	sourceRect.w = id_texture["score"]->w / 10;
+	sourceRect.h = id_texture["score"]->h;
 	if(player==0)destRect.x = 500;
 	else destRect.x = windowWidth-500;
 
@@ -46,7 +46,7 @@ void GraphicsHandler::renderScore(int score,bool player)
 	destRect.w = sourceRect.w;
 	destRect.h = sourceRect.h;
 
-	SDL_RenderTexture(mainRenderer, scoreTexture, &sourceRect, &destRect);
+	SDL_RenderTexture(mainRenderer, id_texture["score"], &sourceRect, &destRect);
 
 }
 void GraphicsHandler::renderGraphics()
@@ -56,7 +56,7 @@ void GraphicsHandler::renderGraphics()
 		SDL_RenderClear(mainRenderer);
 
 		renderClassicMap();
-		Ball::instance().render(mainRenderer, ballTexture);
+		Ball::instance().render(mainRenderer, id_texture["classicBall"]);
 		//SDL_RenderPresent(mainRenderer);
 }
 bool GraphicsHandler::init(int _windowWidth, int _windowHeight)
@@ -81,7 +81,14 @@ bool GraphicsHandler::init(int _windowWidth, int _windowHeight)
 		return false;
 	}
 	//initialize Media and Graphics
-	if (loadMedia() == false) {
+	if (loadMedia("../assets/theBall.png","classicBall") == false ||
+		loadMedia("../assets/fancy-ball.png", "fancyBall") == false ||
+		loadMedia("../assets/0To9_Score(1).png", "score")==false ||
+		loadMedia("../assets/fancy-court.png", "fancyMap") == false ||
+		loadMedia("../assets/fancy-paddle-green.png", "fancyPaddle") == false
+		)
+
+	{
 		SDL_Log("Media could not be loaded ! SDL error: %s\n", SDL_GetError());
 		return false;
 	}
@@ -91,19 +98,32 @@ bool GraphicsHandler::init(int _windowWidth, int _windowHeight)
 	// if everything went right, return true 
 	return true;
 }
-bool GraphicsHandler::loadMedia()
+void GraphicsHandler::renderFancyMap()
 {
-	string ballFilePath = "../assets/theBall.png";
-	string fancyBall = "../assets/fancy-ball.png";
-	string scoreFilePath = "../assets/0To9_Score(1).png";
+	
+	SDL_FRect sourceRect, destRect;
 
-	ballTexture = IMG_LoadTexture(mainRenderer, fancyBall.c_str());
-	if (ballTexture == NULL) {
-		SDL_Log("image could not be loaded!! SDL error: %s\n", SDL_GetError());
-		return false;
-	}
-	scoreTexture = IMG_LoadTexture(mainRenderer, scoreFilePath.c_str());
-	if (scoreTexture == NULL) {
+	sourceRect.x = 0;
+	sourceRect.y = 0;
+	sourceRect.w = id_texture["fancyMap"]->w;
+	sourceRect.h = id_texture["fancyMap"]->h;
+
+	destRect.y =destRect.x=0;
+	destRect.w = sourceRect.w;
+	destRect.h = sourceRect.h;
+
+	SDL_RenderTexture(mainRenderer, id_texture["fancyMap"], &sourceRect, &destRect);
+
+	Ball::instance().render(mainRenderer, id_texture["fancyBall"]);
+
+}
+bool GraphicsHandler::loadMedia(string filePath,string id)
+{
+	id_texture[id] = new SDL_Texture();
+
+	id_texture[id] = IMG_LoadTexture(mainRenderer, filePath.c_str());
+	if (id_texture[id] == NULL) {
+		SDL_Log(filePath.c_str());
 		SDL_Log("image could not be loaded!! SDL error: %s\n", SDL_GetError());
 		return false;
 	}
@@ -118,18 +138,21 @@ void GraphicsHandler::renderClassicMap()
 	drawLine(0, windowWidth, 35, 15, false, false);
 	//render the lower horizontal non-dashed line 
 	drawLine(windowHeight-15, windowWidth, 35, 15, false, false);
-	Ball::instance().render(mainRenderer, ballTexture);
+
+	Ball::instance().render(mainRenderer, id_texture["classicBall"]);
 }
 void GraphicsHandler::clean() {
 	//to avoid memory leakes
 	SDL_DestroyWindow(mainWindow);
 	SDL_DestroyRenderer(mainRenderer);
-	SDL_DestroyTexture(ballTexture);
+	for (auto& x : id_texture) {
+		SDL_DestroyTexture(x.second);
+		x.second = nullptr;
+	}
 
 	//to avoid dangling pointers
 	mainWindow = nullptr;
 	mainRenderer = nullptr;
-	ballTexture = nullptr;
 	cout << "cleaned graphics\n";
 
 }

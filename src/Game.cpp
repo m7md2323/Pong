@@ -16,10 +16,12 @@ void Game::update() {
 	}
 	if (checkCollision(leftPlayer) ||
 		checkCollision(rightPlayer)) {
+		collision = false;
 		Ball::instance().speedUp(1.05f, 9);
 	}
+	else collision = false;;
 	// wall collision
-	if (Ball::instance().position.getY() <= 15 || Ball::instance().position.getY() + 25 >= 800-15) {
+	if (Ball::instance().position.getY() <= 15 || Ball::instance().position.getY() + 25 >= GraphicsHandler::instance().getWindowHeight()-15) {
 		Ball::instance().velocity.setY(-1 * Ball::instance().velocity.getY());
 	}
 
@@ -28,13 +30,17 @@ void Game::update() {
 
 void Game::render()
 {
-	SDL_SetRenderDrawColor(GraphicsHandler::instance().getRenderer(), 50, 50, 50, 255);
+	//SDL_SetRenderDrawColor(GraphicsHandler::instance().getRenderer(), 50, 50, 50, 255);
+	//
 	SDL_RenderClear(GraphicsHandler::instance().getRenderer());
-
-	leftPlayer->render(GraphicsHandler::instance().getRenderer());
-	rightPlayer->render(GraphicsHandler::instance().getRenderer());
-
-	GraphicsHandler::instance().renderClassicMap();
+	GraphicsHandler::instance().renderFancyMap();
+	leftPlayer->render(GraphicsHandler::instance().getRenderer(),1);
+	rightPlayer->render(GraphicsHandler::instance().getRenderer(),1);
+	
+	
+	
+	//GraphicsHandler::instance().renderClassicMap();
+	//GraphicsHandler::instance().renderFancyMap();
 	//Ball::instance().render(GraphicsHandler::instance().getRenderer());
 	GraphicsHandler::instance().renderScore(leftPlayerScore, 0);
 	GraphicsHandler::instance().renderScore(rightPlayerScore, 1);
@@ -43,13 +49,12 @@ void Game::render()
 }
 Game::Game():leftPlayer{NULL}, rightPlayer{NULL}
 {
-	leftPlayer = new Paddle(20,80,40, GraphicsHandler::instance().getWindowHeight()/2);
-	rightPlayer = new Paddle(20,80, 1000, GraphicsHandler::instance().getWindowHeight() / 2);
+	leftPlayer = new Paddle(32,120,40, GraphicsHandler::instance().getWindowHeight()/2);
+	rightPlayer = new Paddle(32,120,700-40, GraphicsHandler::instance().getWindowHeight() / 2);
 	//rightPlayer->position.setX(rightPlayer->position.getX() + 1000);
-	graphicsOffset = 43;
 	rightPlayerScore = 0;
 	leftPlayerScore = 0;
-	speed = 1;
+	speed =6;
 }
 
 Game::~Game()
@@ -96,14 +101,9 @@ vector<vector<vector<Uint8>>> Game::storeImageAsMatrix(string filePath)
 
 bool Game::init()
 {
-	GraphicsHandler::instance().init(1200,800);
+	GraphicsHandler::instance().init(800,600);
 	//initialize Media and Graphics
-	if (GraphicsHandler::instance().loadMedia() == false) {
-		SDL_Log("Media could not be loaded ! SDL error: %s\n", SDL_GetError());
-		return false;
-	}
-	//build characters
-	//player1 = new Paddle();
+
 	initSpeedForBall();
 	// if everything went right, return true 
 	return true;
@@ -112,6 +112,7 @@ bool Game::init()
 void Game::inputHandler()
 {
 	InputHandler::Instance().update();
+
 }
 
 
@@ -157,6 +158,14 @@ void Game::updateScore()
 
 
 }
+void Game::mainMenu()
+{
+	//load media
+	//show play and quit buttons 
+	//after play show modes (fancy, classic, more than two players)
+	//enter the game after that
+	//build state machine class
+}
 float dotProduct(Vector2D v1,Vector2D v2) {
 	return v1.getX() * v2.getX() + v1.getY() * v2.getY();
 }
@@ -178,10 +187,11 @@ bool Game::checkCollision(Paddle *p)
 	//Vector2D N(, dy);
 	//Vector2D* V = &Ball::instance().velocity;
 	//N.normalize();
-	if ((bx1 <= px2 && bx1 >= px1 || bx2 >= px1 && bx2 <= px2) && by1 >= py1 && by2 <= py2) {
+	/*if ((bx1 <= px2 && bx1 >= px1 || bx2 >= px1 && bx2 <= px2) && by1 >= py1 && by2 <= py2&&collision==false) {
 		Ball::instance().velocity.setX(-1*Ball::instance().velocity.getX());
+		collision = true;
 		return true;
-	}
+	}*/
 
 
 
@@ -193,7 +203,7 @@ bool Game::checkCollision(Paddle *p)
 
 
 
-	/*float cx = Ball::instance().getCenterX();
+	float cx = Ball::instance().getCenterX();
 	float cy = Ball::instance().getCenterY();
 	float r = Ball::instance().getRadis();
 
@@ -203,16 +213,16 @@ bool Game::checkCollision(Paddle *p)
 	float dx = cx - closestX;
 	float dy = cy - closestY;
 
-	Vector2D N(dx, dy);
+	//Vector2D N(dx, dy);
 	Vector2D *V = &Ball::instance().velocity;
-	N.normalize();
+	//N.normalize();
 	//v' = v - (1 + e) * (v · n) * n
 	// dx,dy from closest point to center
-	if (dx * dx + dy * dy <= r * r) {
-		//speedUpBall();
-		Vector2D N(dx, dy);
+	if ((dx * dx + dy * dy <= r * r)) {
+		//collision = true;
+	
 		float dist = sqrtf(dx * dx + dy * dy);
-
+		Vector2D N(dx, dy);
 		if (dist == 0) {
 			// Edge case: ball center exactly at closest point
 			N = Vector2D(1, 0);
@@ -228,11 +238,12 @@ bool Game::checkCollision(Paddle *p)
 
 		// Reflect velocity
 		Vector2D* V = &Ball::instance().velocity;
-		float e = 1.0f;
+		float e = 0.9f;
 		*V = *V - N * (1 + e) * dotProduct(N, *V);
+		//V->setX(V->getX() * -1);
 
 		return true;
-	}*/
+	}
 	return false;
 }
 
