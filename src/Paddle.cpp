@@ -1,19 +1,40 @@
 #include "Paddle.h"
 #include "GraphicsHandler.h"
-//to be updated after (the initial position)
-Paddle::Paddle(float width,float height,int x,int y):position(x,y),width{width},height{height},score{0}
-{
+#include "InputHandler.h"
 
+//to be updated after (the initial position)
+Paddle::Paddle(int x,int y,string _playerSide):position(x,y),score{0},playerSide{_playerSide}
+{
 }
 
 Paddle::~Paddle()
 {
 	clean();
 }
-
+bool Paddle::init() {
+	width = GraphicsHandler::instance().getTextureById("fancyPaddle")->w;
+	height = GraphicsHandler::instance().getTextureById("fancyPaddle")->h;
+	return true;
+}
 void Paddle::update()
 {
-
+	if (playerSide == "left") {
+		
+		if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_W)) {
+			moveUp();
+		}
+		if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_S)) {
+			moveDown();
+		}
+	}
+	if (playerSide == "right") {
+		if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_UP)) {
+			moveUp();
+		}
+		if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_DOWN)) {
+			moveDown();
+		}
+	}
 }
 
 
@@ -32,8 +53,6 @@ void Paddle::render(SDL_Renderer* mainRenderer,bool mode)
 	else {
 		SDL_FRect sourceRect, destRect;
 		
-		
-		cout << GraphicsHandler::instance().getTextureById("fancyPaddle")->w<<"\n";
 		sourceRect.x =0;
 		sourceRect.y =0;
 		sourceRect.w = GraphicsHandler::instance().getTextureById("fancyPaddle")->w;
@@ -63,13 +82,13 @@ void Paddle::clean()
 void Paddle::moveUp()
 {
 	if (position.getY()>= 15) {
-		position.setY(position.getY() - 6);
+		position.setY(position.getY() - 8);
 	}
 }
 void Paddle::moveDown()
 {
 	if (position.getY()+height <= 583) {
-		position.setY(position.getY() + 6);
+		position.setY(position.getY() + 8);
 	}
 }
 

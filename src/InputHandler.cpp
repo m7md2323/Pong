@@ -63,7 +63,7 @@ int InputHandler::onKeyUp(SDL_Event *e)
 void InputHandler::onMouseMove(SDL_Event& event)
 {
 	if (event.type == SDL_EVENT_MOUSE_MOTION) {
-		std::cout << event.motion.x<<" "<<event.motion.y << "\n";;
+		//std::cout << event.motion.x<<" "<<event.motion.y << "\n";;
 		m_mousePosition->setX(event.motion.x);
 		m_mousePosition->setY(float(event.motion.y));
 	}

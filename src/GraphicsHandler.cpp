@@ -1,4 +1,5 @@
 #include "GraphicsHandler.h"
+#include"Ball.h"
 void GraphicsHandler::drawLine(int start, int end, int width, int height, bool dashed, bool VerOrHor)
 {
 	SDL_FRect rectForLine;
@@ -32,7 +33,7 @@ void GraphicsHandler::drawLine(int start, int end, int width, int height, bool d
 }
 void GraphicsHandler::renderScore(int score,bool player)
 {
-	//left player score
+
 	SDL_FRect sourceRect, destRect;
 
 	sourceRect.x = (id_texture["score"]->w / 10) * score;
@@ -85,7 +86,7 @@ bool GraphicsHandler::init(int _windowWidth, int _windowHeight)
 		loadMedia("../assets/fancy-ball.png", "fancyBall") == false ||
 		loadMedia("../assets/0To9_Score(1).png", "score")==false ||
 		loadMedia("../assets/fancy-court.png", "fancyMap") == false ||
-		loadMedia("../assets/fancy-paddle-green.png", "fancyPaddle") == false
+		loadMedia("../assets/fancy-paddle-blue1.png", "fancyPaddle") == false
 		)
 
 	{
@@ -124,7 +125,7 @@ bool GraphicsHandler::loadMedia(string filePath,string id)
 	id_texture[id] = IMG_LoadTexture(mainRenderer, filePath.c_str());
 	if (id_texture[id] == NULL) {
 		SDL_Log(filePath.c_str());
-		SDL_Log("image could not be loaded!! SDL error: %s\n", SDL_GetError());
+		SDL_Log("Image could not be loaded!! SDL error: %s\n", SDL_GetError());
 		return false;
 	}
 	return true;
@@ -157,7 +158,7 @@ void GraphicsHandler::clean() {
 
 }
 
-GraphicsHandler::GraphicsHandler()
+GraphicsHandler::GraphicsHandler():mainRenderer{nullptr},mainWindow{nullptr},windowHeight{0},windowWidth{0}
 {
 }
 

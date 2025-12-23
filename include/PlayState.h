@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 #include"GameState.h"
 using namespace std;
 class PlayState:GameState {

@@ -1,56 +1,40 @@
 #include "Game.h"
 //Game* Game::_instance = NULL;
 void Game::update() {
-	Ball::instance().update();
-	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_W)) {
-		leftPlayer->moveUp();
-	}
-	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_S)) {
-		leftPlayer->moveDown();
-	}
-	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_UP)) {
-		rightPlayer->moveUp();
-	}
-	if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_DOWN)) {
-		rightPlayer->moveDown();
-	}
-	if (checkCollision(leftPlayer) ||
-		checkCollision(rightPlayer)) {
-		collision = false;
-		Ball::instance().speedUp(1.05f, 9);
-	}
-	else collision = false;;
-	// wall collision
-	if (Ball::instance().position.getY() <= 15 || Ball::instance().position.getY() + 25 >= GraphicsHandler::instance().getWindowHeight()-15) {
-		Ball::instance().velocity.setY(-1 * Ball::instance().velocity.getY());
-	}
 
-	updateScore();
+	
+	Ball::instance().update(leftPlayer,rightPlayer);
+	//Ball::instance().update(leftPlayer);
+
+	leftPlayer->update();
+	rightPlayer->update();
+
+	//updateScore();
 }
 
 void Game::render()
 {
-	//SDL_SetRenderDrawColor(GraphicsHandler::instance().getRenderer(), 50, 50, 50, 255);
+	SDL_SetRenderDrawColor(GraphicsHandler::instance().getRenderer(), 50, 50, 50, 255);
 	//
 	SDL_RenderClear(GraphicsHandler::instance().getRenderer());
-	GraphicsHandler::instance().renderFancyMap();
-	leftPlayer->render(GraphicsHandler::instance().getRenderer(),1);
-	rightPlayer->render(GraphicsHandler::instance().getRenderer(),1);
+	GraphicsHandler::instance().renderClassicMap();
+	leftPlayer->render(GraphicsHandler::instance().getRenderer(),0);
+	rightPlayer->render(GraphicsHandler::instance().getRenderer(),0);
 	
 	
 	
 	//GraphicsHandler::instance().renderClassicMap();
 	//GraphicsHandler::instance().renderFancyMap();
 	//Ball::instance().render(GraphicsHandler::instance().getRenderer());
-	GraphicsHandler::instance().renderScore(leftPlayerScore, 0);
-	GraphicsHandler::instance().renderScore(rightPlayerScore, 1);
+	GraphicsHandler::instance().renderScore(leftPlayer->getScore(), 1);
+	GraphicsHandler::instance().renderScore(rightPlayer->getScore(), 0);
 
 	SDL_RenderPresent(GraphicsHandler::instance().getRenderer());
 }
 Game::Game():leftPlayer{NULL}, rightPlayer{NULL}
 {
-	leftPlayer = new Paddle(32,120,40, GraphicsHandler::instance().getWindowHeight()/2);
-	rightPlayer = new Paddle(32,120,700-40, GraphicsHandler::instance().getWindowHeight() / 2);
+	leftPlayer = new Paddle(40, GraphicsHandler::instance().getWindowHeight()/2,"left");
+	rightPlayer = new Paddle(800-60, GraphicsHandler::instance().getWindowHeight() / 2,"right");
 	//rightPlayer->position.setX(rightPlayer->position.getX() + 1000);
 	rightPlayerScore = 0;
 	leftPlayerScore = 0;
@@ -102,8 +86,9 @@ vector<vector<vector<Uint8>>> Game::storeImageAsMatrix(string filePath)
 bool Game::init()
 {
 	GraphicsHandler::instance().init(800,600);
+	leftPlayer->init();
+	rightPlayer->init();
 	//initialize Media and Graphics
-
 	initSpeedForBall();
 	// if everything went right, return true 
 	return true;
@@ -133,31 +118,6 @@ void Game::initSpeedForBall()
 
 }
 /**/
-void Game::updateScore()
-{
-	int ballX = Ball::instance().position.getX();
-	int ballY = Ball::instance().position.getY();
-
-	bool leftSideGoal = ballX + 25 < 0;
-	bool rightSideGoal =ballX>GraphicsHandler::instance().getWindowWidth();
-	
-	if (leftSideGoal || rightSideGoal) {
-		if (leftSideGoal) {
-			rightPlayerScore++;
-		}
-		if (rightSideGoal) {
-			leftPlayerScore++;
-		}
-		Ball::instance().position = Vector2D(GraphicsHandler::instance().getWindowWidth() / 2, GraphicsHandler::instance().getWindowHeight() / 2);
-		initSpeedForBall();
-	}
-	//cout << leftPlayerScore << " " << rightPlayerScore << "\n";
-	//Ball::instance().position = Vector2D(windowHeight / 2, windowHeight / 2);
-	//updateScore();
-	//update score on screen
-
-
-}
 void Game::mainMenu()
 {
 	//load media
@@ -165,86 +125,6 @@ void Game::mainMenu()
 	//after play show modes (fancy, classic, more than two players)
 	//enter the game after that
 	//build state machine class
-}
-float dotProduct(Vector2D v1,Vector2D v2) {
-	return v1.getX() * v2.getX() + v1.getY() * v2.getY();
-}
-bool Game::checkCollision(Paddle *p)
-{
-	//vector<vector<vector<Uint8>>> ballAsMatrix = storeImageAsMatrix(ballFilePath);
-	//ball collision
-	//paddle
-	float px1 = p->position.getX();
-	float py1 = p->position.getY();
-	float px2 = p->position.getX()+p->getWidth();
-	float py2 = p->position.getY()+p->getHeight();
-	//ball
-	float bx1 = Ball::instance().position.getX();
-	float by1 = Ball::instance().position.getY();
-	float bx2 = Ball::instance().position.getX() + 25;
-	float by2 = Ball::instance().position.getY() + 25;
-
-	//Vector2D N(, dy);
-	//Vector2D* V = &Ball::instance().velocity;
-	//N.normalize();
-	/*if ((bx1 <= px2 && bx1 >= px1 || bx2 >= px1 && bx2 <= px2) && by1 >= py1 && by2 <= py2&&collision==false) {
-		Ball::instance().velocity.setX(-1*Ball::instance().velocity.getX());
-		collision = true;
-		return true;
-	}*/
-
-
-
-
-
-
-
-
-
-
-
-	float cx = Ball::instance().getCenterX();
-	float cy = Ball::instance().getCenterY();
-	float r = Ball::instance().getRadis();
-
-	float closestX = clamp(cx, px1, px2);
-	float closestY = clamp(cy, py1, py2);
-
-	float dx = cx - closestX;
-	float dy = cy - closestY;
-
-	//Vector2D N(dx, dy);
-	Vector2D *V = &Ball::instance().velocity;
-	//N.normalize();
-	//v' = v - (1 + e) * (v · n) * n
-	// dx,dy from closest point to center
-	if ((dx * dx + dy * dy <= r * r)) {
-		//collision = true;
-	
-		float dist = sqrtf(dx * dx + dy * dy);
-		Vector2D N(dx, dy);
-		if (dist == 0) {
-			// Edge case: ball center exactly at closest point
-			N = Vector2D(1, 0);
-			dist = 1;
-		}
-		else {
-			N /= dist; // normalize
-		}
-
-		// Move ball out of collision
-		float penetration = r - dist;
-		Ball::instance().position += N * penetration;
-
-		// Reflect velocity
-		Vector2D* V = &Ball::instance().velocity;
-		float e = 0.9f;
-		*V = *V - N * (1 + e) * dotProduct(N, *V);
-		//V->setX(V->getX() * -1);
-
-		return true;
-	}
-	return false;
 }
 
 void Game::clean()

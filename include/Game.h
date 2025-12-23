@@ -28,13 +28,8 @@ public:
 	void update();
 	void render();
 	void clean();
-	bool loadMedia();
-
-	bool checkCollision(Paddle* p);
 
 	void initSpeedForBall();
-	//void renderScore(int score,bool player);//left 0 right 1
-	void updateScore();
 
 	void mainMenu();
 

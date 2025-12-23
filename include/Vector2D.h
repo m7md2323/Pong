@@ -13,6 +13,10 @@ public:
 	//some Math operations on Vectors
 	//length 
 	float length() { return sqrt(xPos * xPos + yPos * yPos); }
+	//Dot product
+	static float dotProduct(Vector2D v1, Vector2D v2) {
+		return v1.getX() * v2.getX() + v1.getY() * v2.getY();
+	}
 	//addition using operator overloading
 	Vector2D& operator+=(float scalar)
 	{

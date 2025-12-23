@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 
 #include"GameState.h"
 #include<stack>
