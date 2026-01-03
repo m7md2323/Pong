@@ -54,6 +54,8 @@ private:
 	BallState state=MOVING;
 	float width = 25;
 	float height = 25;
+
+	float speed;
 	//SDL_FPoint ballEdges;
 	//SDL_Texture* ballImage;//clean
 

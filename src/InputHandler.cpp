@@ -3,6 +3,19 @@
 #include<iostream>
 #include"Paddle.h"
 
+bool InputHandler::mouseOverObject(float x, float y, float w, float h)
+{
+	if ((m_mousePosition->getX() > x) &&
+		(m_mousePosition->getX() < x + w) &&
+		(m_mousePosition->getY() > y) &&
+		((m_mousePosition->getY() < y + h))
+		) 
+	{
+		return true;
+	}
+	return false;
+}
+
 bool InputHandler::isKeyDown(SDL_Scancode key)
 {
 	if (m_keyState != 0)
@@ -34,10 +47,10 @@ void InputHandler::update()
 			onMouseMove(event);
 			break;
 		case SDL_EVENT_MOUSE_BUTTON_DOWN:
-			//onMouseButtonDown(event);
+			onMouseButtonDown(event);
 			break;
 		case SDL_EVENT_MOUSE_BUTTON_UP:
-			//onMouseButtonUp(event);
+			onMouseButtonUp(event);
 			break;
 		case SDL_EVENT_KEY_DOWN:
 			onKeyDown(&event);

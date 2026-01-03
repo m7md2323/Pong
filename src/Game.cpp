@@ -2,50 +2,54 @@
 //Game* Game::_instance = NULL;
 void Game::update() {
 
-	
-	Ball::instance().update(leftPlayer,rightPlayer);
-	//Ball::instance().update(leftPlayer);
+	GameState* gameState = GameStateMachine::topState();
+	gameState->update();
+	if (gameState->getStateID() == "PLAY") {
+		Ball::instance().update(leftPlayer, rightPlayer);
+		leftPlayer->update();
+		rightPlayer->update();
+	}
+	else if (gameState->getStateID() == "MENU") {
 
-	leftPlayer->update();
-	rightPlayer->update();
+	}
 
-	//updateScore();
 }
 
 void Game::render()
 {
-	SDL_SetRenderDrawColor(GraphicsHandler::instance().getRenderer(), 50, 50, 50, 255);
-	//
-	SDL_RenderClear(GraphicsHandler::instance().getRenderer());
-	GraphicsHandler::instance().renderClassicMap();
-	leftPlayer->render(GraphicsHandler::instance().getRenderer(),0);
-	rightPlayer->render(GraphicsHandler::instance().getRenderer(),0);
 	
-	
-	
-	//GraphicsHandler::instance().renderClassicMap();
-	//GraphicsHandler::instance().renderFancyMap();
-	//Ball::instance().render(GraphicsHandler::instance().getRenderer());
-	GraphicsHandler::instance().renderScore(leftPlayer->getScore(), 1);
-	GraphicsHandler::instance().renderScore(rightPlayer->getScore(), 0);
+	if (GameStateMachine::topState()->getStateID() == "MENU") {
+		GameStateMachine::topState()->render();
+	}
+	else {
+		SDL_SetRenderDrawColor(GraphicsHandler::instance().getRenderer(), 50, 50, 50, 255);
+		//
+		SDL_RenderClear(GraphicsHandler::instance().getRenderer());
+		GraphicsHandler::instance().renderFancyMap();
+		leftPlayer->render(GraphicsHandler::instance().getRenderer(), 1);
+		rightPlayer->render(GraphicsHandler::instance().getRenderer(), 1);
 
+
+
+		//GraphicsHandler::instance().renderClassicMap();
+		//GraphicsHandler::instance().renderFancyMap();
+		//Ball::instance().render(GraphicsHandler::instance().getRenderer());
+		GraphicsHandler::instance().renderScore(leftPlayer->getScore(), 1);
+		GraphicsHandler::instance().renderScore(rightPlayer->getScore(), 0);
+	}
 	SDL_RenderPresent(GraphicsHandler::instance().getRenderer());
 }
 Game::Game():leftPlayer{NULL}, rightPlayer{NULL}
 {
 	leftPlayer = new Paddle(40, GraphicsHandler::instance().getWindowHeight()/2,"left");
 	rightPlayer = new Paddle(800-60, GraphicsHandler::instance().getWindowHeight() / 2,"right");
-	//rightPlayer->position.setX(rightPlayer->position.getX() + 1000);
-	rightPlayerScore = 0;
-	leftPlayerScore = 0;
-	speed =6;
 }
 
 Game::~Game()
 {
 	clean();
 }
-
+//this function is not used yet, I think its just cool function.
 vector<vector<vector<Uint8>>> Game::storeImageAsMatrix(string filePath)
 {
 	SDL_Surface* tempCopy = IMG_Load(filePath.c_str());
@@ -85,46 +89,32 @@ vector<vector<vector<Uint8>>> Game::storeImageAsMatrix(string filePath)
 
 bool Game::init()
 {
-	GraphicsHandler::instance().init(800,600);
-	leftPlayer->init();
-	rightPlayer->init();
 	//initialize Media and Graphics
-	initSpeedForBall();
+	if (!GraphicsHandler::instance().init(800, 600)) {
+		SDL_Log("init GraphicsHandler object went wrong SDL error: %s\n", SDL_GetError());
+		return false;
+	}
+	// Paddle init function always returs true because its only the Graphics handler passing the right dimenstions for Paddles
+	if (!leftPlayer->init() || !rightPlayer->init()) {
+		SDL_Log("init Players objects went wrong SDL error: %s\n", SDL_GetError());
+		return false;
+	}
+	// User interface initialization
+	if (!UIHandler::instance().init()) {
+		SDL_Log("initializing user interface went wrong SDL error: %s\n", SDL_GetError());
+		return false;
+	}
+	GameStateMachine::pushState(new MenuState());
 	// if everything went right, return true 
 	return true;
 }
 
 void Game::inputHandler()
 {
+	if(UIHandler::instance().onPlayClicked()){
+		GameStateMachine::changeState(new PlayState());
+	}
 	InputHandler::Instance().update();
-
-}
-
-
-void Game::initSpeedForBall()
-{
-	/*random_device rd;*/
-	// Non-deterministic random number generator
-	//std::mt19937 gen(rd()); // Seed with random_device
-	// Alternatively, for reproducible sequences or if random_device is not available:
-	mt19937 gen(chrono::high_resolution_clock::now().time_since_epoch().count());
-	uniform_int_distribution<> distrib(-30.0f, 30.0f); // Numbers between -30.0 and 30.0 (inclusive)
-	float randomNumber = distrib(gen);
-	float angle = randomNumber*numbers::pi / 180.0f;
-
-	int dir = rand() % 2 == 0 ? 1 : -1;
-	Vector2D velocity(dir * speed * cos(angle), speed * sin(angle));
-	Ball::instance().velocity = velocity;
-
-}
-/**/
-void Game::mainMenu()
-{
-	//load media
-	//show play and quit buttons 
-	//after play show modes (fancy, classic, more than two players)
-	//enter the game after that
-	//build state machine class
 }
 
 void Game::clean()

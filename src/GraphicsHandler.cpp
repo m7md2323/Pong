@@ -50,16 +50,6 @@ void GraphicsHandler::renderScore(int score,bool player)
 	SDL_RenderTexture(mainRenderer, id_texture["score"], &sourceRect, &destRect);
 
 }
-void GraphicsHandler::renderGraphics()
-{
-
-		SDL_SetRenderDrawColor(mainRenderer, 50, 50, 50, 255);
-		SDL_RenderClear(mainRenderer);
-
-		renderClassicMap();
-		Ball::instance().render(mainRenderer, id_texture["classicBall"]);
-		//SDL_RenderPresent(mainRenderer);
-}
 bool GraphicsHandler::init(int _windowWidth, int _windowHeight)
 {
 	this->windowWidth = _windowWidth;
@@ -86,16 +76,16 @@ bool GraphicsHandler::init(int _windowWidth, int _windowHeight)
 		loadMedia("../assets/fancy-ball.png", "fancyBall") == false ||
 		loadMedia("../assets/0To9_Score(1).png", "score")==false ||
 		loadMedia("../assets/fancy-court.png", "fancyMap") == false ||
-		loadMedia("../assets/fancy-paddle-blue1.png", "fancyPaddle") == false
+		loadMedia("../assets/fancy-paddle-blue1.png", "fancyPaddle") == false||
+		loadMedia("../assets/PlayButton.png","playButton")==false||
+		loadMedia("../assets/PONG.png", "PONG") == false
 		)
 
 	{
 		SDL_Log("Media could not be loaded ! SDL error: %s\n", SDL_GetError());
 		return false;
 	}
-	//build characters
-	//player1 = new Paddle();
-	//initSpeedForBall();
+
 	// if everything went right, return true 
 	return true;
 }

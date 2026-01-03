@@ -17,14 +17,16 @@ public:
 	void renderClassicMap();
 	bool loadMedia(string filePath,string id);
 	void drawLine(int start, int end, int width, int height, bool dashed, bool VerOrHor);
-	void renderGraphics();
-	void clean();
+	
 	void renderScore(int score,bool player);
 	int getWindowWidth() { return windowWidth; }
 	int getWindowHeight() { return windowHeight; }
+
 	SDL_Texture* getTextureById(string id) { return id_texture[id]; }
 
 	SDL_Renderer* getRenderer() { return mainRenderer; }
+	
+	void clean();
 protected:
 
 	GraphicsHandler();
@@ -33,6 +35,7 @@ protected:
 private:
 	SDL_Window* mainWindow;
 	SDL_Renderer* mainRenderer;
+
 	int windowWidth;
 	int windowHeight;
 

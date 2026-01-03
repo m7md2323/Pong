@@ -5,6 +5,10 @@
 #include"Paddle.h"
 #include"InputHandler.h"
 #include"GraphicsHandler.h"
+#include"GameStateMachine.h"
+#include"MenuState.h"
+#include"PlayState.h"
+#include"UIHandler.h"
 #include<iostream>
 #include<vector>
 #include<cmath>
@@ -29,24 +33,12 @@ public:
 	void render();
 	void clean();
 
-	void initSpeedForBall();
-
-	void mainMenu();
-
 protected:
 	Game();
 	~Game();
 private:
 
 	vector<vector<vector<Uint8>>> storeImageAsMatrix(string filePath);
-	float speed;
-
-	bool collision=false;
-
-	int graphicsOffset;
-	int leftPlayerScore;
-	int rightPlayerScore;
-
 	//Game objects:
 	//2 Paddles
 	Paddle *leftPlayer, *rightPlayer;//clean

@@ -93,7 +93,7 @@ bool Ball::checkAndHandleCollision(Paddle* p)
 	float cx = getCenterX();
 	float cy = getCenterY();
 	float r = getRadis();
-
+	//ball
 	float closestX = clamp(cx, px1, px2);
 	float closestY = clamp(cy, py1, py2);
 
@@ -105,6 +105,8 @@ bool Ball::checkAndHandleCollision(Paddle* p)
 	//N.normalize();
 	//v' = v - (1 + e) * (v · n) * n
 	// dx,dy from closest point to center
+	// 
+	//-----Gemini modified version-----//
 	if ((dx * dx + dy * dy <= r * r)) {
 		// 1. Resolve penetration (keep your existing code for this)
 		float dist = sqrtf(dx * dx + dy * dy);
@@ -168,9 +170,9 @@ bool Ball::checkOutOfBound()
 	return false;
 }
 //to be updated after (the initial position)
-Ball::Ball() :position(1200/2,800/2), velocity(-5, 0)
+Ball::Ball() :position(GraphicsHandler::instance().getWindowWidth() / 2, GraphicsHandler::instance().getWindowHeight() / 2), 
+	velocity(-5, 0)
 {
-
 }
 
 Ball::~Ball()

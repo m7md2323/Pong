@@ -2,6 +2,7 @@
 #include<SDL3/SDL.h>
 #include "Vector2D.h"
 #include<vector>
+#include<map>
 #include"Paddle.h"
 using namespace std;
 //this class instance is created using the Meyers’ singleton creational design pattern 
@@ -20,6 +21,7 @@ public:
 
 	bool gameRunning() { return m_gameRunning; }
 
+	bool mouseOverObject(float x,float y,float w,float h);
 	Vector2D* getMousePosition() { return m_mousePosition; }
 
 	bool isKeyDown(SDL_Scancode key);
@@ -30,7 +32,7 @@ private:
 	~InputHandler() { clean();}
 
 	vector<vector<bool>> m_buttonStates;
-	vector<bool> m_mouseButtonStates;
+	map<int,bool> m_mouseButtonStates;
 
 	Vector2D* m_mousePosition;
 

@@ -1,5 +1,5 @@
 #include "GameStateMachine.h"
-
+stack<GameState*> GameStateMachine::gameStates;
 void GameStateMachine::pushState(GameState* state)
 {
 	gameStates.push(state);

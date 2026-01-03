@@ -1,7 +1,5 @@
 #include"Game.h"
 using namespace std;
-Uint32 frameStart;
-int frameTime;
 
 int main() {
 	if (Game::instance().init() == false) {
@@ -14,10 +12,8 @@ int main() {
 		Game::instance().update();
 		Game::instance().render();
 
-		frameTime = SDL_GetTicks() - frameStart;
 		SDL_SetRenderVSync(GraphicsHandler::instance().getRenderer(), 1);
 	}
-	//Game::instance().clean();
 
 	return 0;
 }

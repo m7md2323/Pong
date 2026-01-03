@@ -1,7 +1,7 @@
 #pragma once
 #include"GameState.h"
 using namespace std;
-class PlayState:GameState {
+class PlayState:public GameState {
 public:
 	virtual void update();
 	virtual void render();
@@ -10,5 +10,5 @@ public:
 	virtual string getStateID() const { return playID; }
 private:
 	static const string playID;
-
+	SDL_Texture* ButtonTex;
 };

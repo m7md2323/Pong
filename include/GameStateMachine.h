@@ -7,9 +7,10 @@ using namespace std;
 class GameStateMachine
 {
 public:
-	void pushState(GameState* state);
-	void changeState(GameState* state);
-	void popState();
+	static GameState* topState() { return gameStates.top(); };
+	static void pushState(GameState* state);
+	static void changeState(GameState* state);
+	static void popState();
 private:
-	stack<GameState*> gameStates;
+	static stack<GameState*> gameStates;
 };
