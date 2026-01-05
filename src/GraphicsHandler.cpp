@@ -31,7 +31,7 @@ void GraphicsHandler::drawLine(int start, int end, int width, int height, bool d
 	}
 
 }
-void GraphicsHandler::renderScore(int score,bool player)
+void GraphicsHandler::renderScore(int score,string player)
 {
 
 	SDL_FRect sourceRect, destRect;
@@ -40,8 +40,8 @@ void GraphicsHandler::renderScore(int score,bool player)
 	sourceRect.y = 0;
 	sourceRect.w = id_texture["score"]->w / 10;
 	sourceRect.h = id_texture["score"]->h;
-	if(player==0)destRect.x = 500;
-	else destRect.x = windowWidth-500;
+	if(player=="right")destRect.x = 500;
+	else destRect.x = windowWidth-530;
 
 	destRect.y = 100;
 	destRect.w = sourceRect.w;

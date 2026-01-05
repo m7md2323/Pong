@@ -18,7 +18,7 @@ public:
 	bool loadMedia(string filePath,string id);
 	void drawLine(int start, int end, int width, int height, bool dashed, bool VerOrHor);
 	
-	void renderScore(int score,bool player);
+	void renderScore(int score,string player);
 	int getWindowWidth() { return windowWidth; }
 	int getWindowHeight() { return windowHeight; }
 

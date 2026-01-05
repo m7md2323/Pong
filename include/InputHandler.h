@@ -25,6 +25,11 @@ public:
 	Vector2D* getMousePosition() { return m_mousePosition; }
 
 	bool isKeyDown(SDL_Scancode key);
+
+
+	void exit() {
+		m_gameRunning = false;
+	}
 private:
 	InputHandler() :m_mousePosition{ nullptr }, m_keyState{nullptr}{
 		m_mousePosition = new Vector2D(0, 0);

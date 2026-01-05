@@ -5,6 +5,8 @@
 //to be updated after (the initial position)
 Paddle::Paddle(int x,int y,string _playerSide):position(x,y),score{0},playerSide{_playerSide}
 {
+	width = 10;
+	height = 100;
 }
 
 Paddle::~Paddle()
@@ -12,8 +14,6 @@ Paddle::~Paddle()
 	clean();
 }
 bool Paddle::init() {
-	width = GraphicsHandler::instance().getTextureById("fancyPaddle")->w;
-	height = GraphicsHandler::instance().getTextureById("fancyPaddle")->h;
 	return true;
 }
 void Paddle::update()
@@ -38,7 +38,7 @@ void Paddle::update()
 }
 
 
-
+// 0--> classic  1-->fancy
 void Paddle::render(SDL_Renderer* mainRenderer,bool mode)
 {
 	if (mode == false) {

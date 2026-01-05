@@ -11,16 +11,30 @@ enum Button_Type {
 	PLAY_BUTTON,
 	EXIT_BUTTON,
 	MENU_BUTTON,
+	PAUSE_BUTTON,
 	FANCY_MAP_SEL_BUTTON,
-	CLASSIC_MAP_SEL_BUTTON,
-	PONG_LOGO//not a button, just a logo
+	CLASSIC_MAP_SEL_BUTTON
+};
+enum Text_Type {
+	PONG_LOGO,
+	MAP_MODE_SEL_TEXT,
+	PAUSE_TEXT
+};
+struct Text {
+	Text(Text_Type _type, int _width, int _height) :x{ 0 }, y{0},textType { _type }, width{ _width }, height{ _height } {
+
+	}
+	int x, y;
+	int width;
+	int height;
+	Text_Type textType;
 };
 struct Button {
-	Button(Button_Type _type, Vector2D _buttonPos, int _width, int _height) :buttonPos{ _buttonPos }, buttonType{ _type }, width{ _width },
+	Button(Button_Type _type, int _width, int _height) : x{ 0 }, y{ 0 },buttonType{ _type }, width{ _width },
 		height{ _height } {
 
 	}
-	Vector2D buttonPos;
+	int x, y;
 	int width;
 	int height;
 	Button_Type buttonType;
@@ -32,20 +46,24 @@ public:
 		return instance;
 	}
 	bool init();
-	bool load(string,Button_Type);
+	bool loadButton(string,Button_Type);
+	bool loadText(string, Text_Type);
 	void renderMenu();
 	void renderPause();
 	void renderModeSelect();
 
-	void renderButton(Button_Type);
-	void renderLogo();
+	void renderButton(int,int,Button_Type);
+	void renderText(int,int,Text_Type);
 	void clean();
 
-	bool onPlayClicked();
+	bool onButtonClicked(Button_Type);
 protected:
 	UIHandler(){}
 	~UIHandler() { clean(); }
 private:
 	map<Button_Type, Button*> buttons;
 	map<Button_Type, SDL_Texture*> buttonsTexture;
+
+	map<Text_Type, Text*> texts;
+	map<Text_Type, SDL_Texture*> textsTexture;
 };

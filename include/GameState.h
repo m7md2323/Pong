@@ -4,7 +4,13 @@
 #include"InputHandler.h"
 
 using namespace std;
-
+enum Game_State {
+	MENU,
+	PAUSE,
+	MODE_SELECTING,
+	PLAYING,
+	EXIT
+};
 class GameState
 {
 public:
@@ -12,7 +18,7 @@ public:
 	virtual void render() = 0;
 	virtual bool onEnter() = 0;
 	virtual bool onExit() = 0;
-	virtual std::string getStateID() const = 0;
+	virtual Game_State getStateID() const = 0;
 
 	GameState() = default;
 };

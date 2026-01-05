@@ -2,47 +2,19 @@
 //Game* Game::_instance = NULL;
 void Game::update() {
 
-	GameState* gameState = GameStateMachine::topState();
-	gameState->update();
-	if (gameState->getStateID() == "PLAY") {
-		Ball::instance().update(leftPlayer, rightPlayer);
-		leftPlayer->update();
-		rightPlayer->update();
-	}
-	else if (gameState->getStateID() == "MENU") {
-
-	}
+	GameStateMachine::topState()->update();
 
 }
 
 void Game::render()
 {
 	
-	if (GameStateMachine::topState()->getStateID() == "MENU") {
-		GameStateMachine::topState()->render();
-	}
-	else {
-		SDL_SetRenderDrawColor(GraphicsHandler::instance().getRenderer(), 50, 50, 50, 255);
-		//
-		SDL_RenderClear(GraphicsHandler::instance().getRenderer());
-		GraphicsHandler::instance().renderFancyMap();
-		leftPlayer->render(GraphicsHandler::instance().getRenderer(), 1);
-		rightPlayer->render(GraphicsHandler::instance().getRenderer(), 1);
+	GameStateMachine::topState()->render();
 
-
-
-		//GraphicsHandler::instance().renderClassicMap();
-		//GraphicsHandler::instance().renderFancyMap();
-		//Ball::instance().render(GraphicsHandler::instance().getRenderer());
-		GraphicsHandler::instance().renderScore(leftPlayer->getScore(), 1);
-		GraphicsHandler::instance().renderScore(rightPlayer->getScore(), 0);
-	}
 	SDL_RenderPresent(GraphicsHandler::instance().getRenderer());
 }
-Game::Game():leftPlayer{NULL}, rightPlayer{NULL}
+Game::Game()
 {
-	leftPlayer = new Paddle(40, GraphicsHandler::instance().getWindowHeight()/2,"left");
-	rightPlayer = new Paddle(800-60, GraphicsHandler::instance().getWindowHeight() / 2,"right");
 }
 
 Game::~Game()
@@ -94,11 +66,6 @@ bool Game::init()
 		SDL_Log("init GraphicsHandler object went wrong SDL error: %s\n", SDL_GetError());
 		return false;
 	}
-	// Paddle init function always returs true because its only the Graphics handler passing the right dimenstions for Paddles
-	if (!leftPlayer->init() || !rightPlayer->init()) {
-		SDL_Log("init Players objects went wrong SDL error: %s\n", SDL_GetError());
-		return false;
-	}
 	// User interface initialization
 	if (!UIHandler::instance().init()) {
 		SDL_Log("initializing user interface went wrong SDL error: %s\n", SDL_GetError());
@@ -111,21 +78,53 @@ bool Game::init()
 
 void Game::inputHandler()
 {
-	if(UIHandler::instance().onPlayClicked()){
-		GameStateMachine::changeState(new PlayState());
-	}
 	InputHandler::Instance().update();
+	switch (GameStateMachine::topState()->getStateID()) {
+		case MENU:
+			if (UIHandler::instance().onButtonClicked(PLAY_BUTTON)) {
+				GameStateMachine::changeState(new SelectState());
+				SDL_Delay(250);
+			}
+			else if (UIHandler::instance().onButtonClicked(EXIT_BUTTON)) {
+				InputHandler::Instance().exit();
+				return;
+			}
+			
+			break;
+		case PLAYING:
+			if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_ESCAPE)|| UIHandler::instance().onButtonClicked(PAUSE_BUTTON)) {
+				GameStateMachine::pushState(new PauseState());
+			}
+			break;
+		case PAUSE:
+			if (UIHandler::instance().onButtonClicked(PLAY_BUTTON)) {
+				GameStateMachine::popState();
+			}
+			else if (UIHandler::instance().onButtonClicked(MENU_BUTTON)) {
+				GameStateMachine::changeState(new MenuState());
+				SDL_Delay(500);
+			}
+			else if (UIHandler::instance().onButtonClicked(EXIT_BUTTON)) {
+				InputHandler::Instance().exit();
+				return;
+			}
+			break;
+		case MODE_SELECTING:
+			if (UIHandler::instance().onButtonClicked(FANCY_MAP_SEL_BUTTON)) {
+				PlayState::setMapMode(FANCY);
+				GameStateMachine::changeState(new PlayState());
+			}
+			else if (UIHandler::instance().onButtonClicked(CLASSIC_MAP_SEL_BUTTON)) {
+				PlayState::setMapMode(CLASSIC);
+				GameStateMachine::changeState(new PlayState());
+			}
+			break;
+		default:break;
+	}
+
 }
 
 void Game::clean()
 {
-	//to avoid memory leaks
-	leftPlayer->clean();
-	rightPlayer->clean();
-	delete leftPlayer;
-	delete rightPlayer;
-	//to avoid dangling pointers
-	leftPlayer = NULL;
-	rightPlayer = NULL;
 	cout << "cleaned game\n";
 }
