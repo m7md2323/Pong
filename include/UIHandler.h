@@ -52,8 +52,12 @@ public:
 	void renderPause();
 	void renderModeSelect();
 
-	void renderButton(int,int,Button_Type);
-	void renderText(int,int,Text_Type);
+	void setMenuLayout();
+	void setPauseLayout();
+	void setSelModeLayout();
+
+	void renderButton(Button_Type);
+	void renderText(Text_Type);
 	void clean();
 
 	bool onButtonClicked(Button_Type);

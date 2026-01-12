@@ -32,7 +32,6 @@ void Ball::update(Paddle *p1,Paddle*p2)
 		state = RESET;
 		break;
 	case RESET :
-		position = Vector2D(GraphicsHandler::instance().getWindowWidth() / 2, GraphicsHandler::instance().getWindowHeight() / 2);
 		resetBall();
 		state = MOVING;
 		break;
@@ -62,19 +61,6 @@ void Ball::render(SDL_Renderer * mainRenderer,SDL_Texture * ballTexture)
 	destRect.y = position.getY();
 
 	SDL_RenderTexture(mainRenderer, ballTexture, &sourceRect, &destRect);
-}
-void Ball::speedUp(float factor, float maxSpeed)
-{
-	float currentSpeed = velocity.length();
-	if (currentSpeed < maxSpeed)
-	{
-		// normalize velocity (direction stays the same)
-		Vector2D direction = velocity;
-		direction.normalize();
-		// scale it up
-		velocity = direction * (currentSpeed * factor);
-	}
-	cout << velocity.length() << "\n";
 }
 
 void Ball::clean()
@@ -130,8 +116,9 @@ bool Ball::checkAndHandleCollision(Paddle* p)
 		// 4. Update Velocity
 		velocity = Vector2D(newVelX, newVelY);
 		velocity.normalize();
-		velocity *= speed * 1.05f; // Slightly increase speed on each hit (1.05 = 5% boost)
-
+		if (speed <= 10)
+			velocity *= speed * 1.05f; // Slightly increase speed on each hit (1.05 = 5% boost)
+		else velocity *= speed;
 		return true;
 	}
 	return false;
@@ -168,6 +155,16 @@ bool Ball::checkOutOfBound()
 		return true;
 	}
 	return false;
+}
+void Ball::resetBall()
+{
+	srand(time(nullptr));
+	int randomDir = (rand() % 3) - 1;// -1 0 1
+	randomDir == 0 ? randomDir = 1 : randomDir = randomDir;
+	velocity.setX(randomDir * 5);
+	velocity.setY(1);
+	position.setX(GraphicsHandler::instance().getWindowWidth() / 2);
+	position.setY(GraphicsHandler::instance().getWindowHeight() / 2);
 }
 //to be updated after (the initial position)
 Ball::Ball() :position(GraphicsHandler::instance().getWindowWidth() / 2, GraphicsHandler::instance().getWindowHeight() / 2), 

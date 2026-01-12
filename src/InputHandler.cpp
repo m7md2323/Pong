@@ -33,6 +33,11 @@ bool InputHandler::isKeyDown(SDL_Scancode key)
 }
 void InputHandler::update()
 {
+	// store previous mouse states
+	for (int i = 0; i < 3; i++) {
+		m_prevMouseButtonStates[i] = m_mouseButtonStates[i];
+	}
+
 	SDL_Scancode key;
 	
 	m_keyState = SDL_GetKeyboardState(0);
@@ -97,6 +102,14 @@ void InputHandler::onMouseButtonDown(SDL_Event& event)
 	}
 }
 
+bool InputHandler::init() {
+	//0--> as left click 1--> as middle click 2--> as right click 
+	for (int i = 0; i < 3; i++) {
+		m_mouseButtonStates[i] = false;
+		m_prevMouseButtonStates[i] = false;
+	}
+	return true;
+}
 void InputHandler::onMouseButtonUp(SDL_Event& event)
 {
 	if (event.type == SDL_EVENT_MOUSE_BUTTON_UP) {
@@ -118,4 +131,10 @@ void InputHandler::clean() {
 	m_keyState = nullptr;
 
 	cout << "InputHandler Cleaned\n";
+}
+
+bool InputHandler::isMousePressedOnce(int button)
+{
+
+	return m_mouseButtonStates[button] &&!m_prevMouseButtonStates[button];
 }

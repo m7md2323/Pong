@@ -5,8 +5,8 @@
 //to be updated after (the initial position)
 Paddle::Paddle(int x,int y,string _playerSide):position(x,y),score{0},playerSide{_playerSide}
 {
-	width = 10;
-	height = 100;
+	width = 20;
+	height = 80;
 }
 
 Paddle::~Paddle()

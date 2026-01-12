@@ -34,19 +34,11 @@ public:
 	float getCenterY() { return position.getY() + height / 2.0f; }
 	float getRadis(){return width / 2.0f; }
 	//To start or reset the ball to default state(when moving from RESET to MOVING state);
-	void resetBall() {
-		srand(time(nullptr));
-		int randomDir = (rand() % 3)-1;// -1 0 1
-		randomDir == 0 ? randomDir = 1:randomDir=randomDir;		
-		velocity.setX(randomDir * 5);
-		velocity.setY(1);
-	}
+	void resetBall();
 	BallState getBallState() { return state; }
 
 	Vector2D position;
 	Vector2D velocity;
-
-	void speedUp(float factor, float maxSpeed);
 protected:
 	Ball();
 	~Ball();

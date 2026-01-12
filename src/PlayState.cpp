@@ -5,6 +5,7 @@ PlayState::PlayState():leftPlayer{ NULL }, rightPlayer{ NULL }
 {
 	leftPlayer = new Paddle(40, GraphicsHandler::instance().getWindowHeight() / 2, "left");
 	rightPlayer = new Paddle(800 - 60, GraphicsHandler::instance().getWindowHeight() / 2, "right");
+	Ball::instance().resetBall();
 }
 void PlayState::render() {
 	SDL_SetRenderDrawColor(GraphicsHandler::instance().getRenderer(), 50, 50, 50, 255);
@@ -22,6 +23,7 @@ void PlayState::render() {
 }
 bool PlayState::onEnter()
 {
+	Ball::instance().resetBall();
 	return true;
 }
 void PlayState::init()
@@ -31,7 +33,7 @@ void PlayState::init()
 }
 bool PlayState::onExit()
 {
-	return false;
+	return true;
 }
 
 void PlayState::update() {

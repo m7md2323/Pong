@@ -12,12 +12,16 @@ class InputHandler
 
 public:
 	static InputHandler& Instance() {
+
 		static InputHandler instance;
 		return instance;
 	}
 	void update();
 	void clean();
+	bool init();
+
 	bool getMouseButtonState(int buttonNumber) { return m_mouseButtonStates[buttonNumber]; }
+	bool isMousePressedOnce(int button);
 
 	bool gameRunning() { return m_gameRunning; }
 
@@ -25,6 +29,7 @@ public:
 	Vector2D* getMousePosition() { return m_mousePosition; }
 
 	bool isKeyDown(SDL_Scancode key);
+
 
 
 	void exit() {
@@ -37,7 +42,9 @@ private:
 	~InputHandler() { clean();}
 
 	vector<vector<bool>> m_buttonStates;
+
 	map<int,bool> m_mouseButtonStates;
+	map<int, bool> m_prevMouseButtonStates;
 
 	Vector2D* m_mousePosition;
 

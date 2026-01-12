@@ -42,7 +42,6 @@ bool UIHandler::init() {
 	//init buttons objects
 	buttons[PLAY_BUTTON] = new Button(PLAY_BUTTON,  buttonsTexture[PLAY_BUTTON]->w/2, buttonsTexture[PLAY_BUTTON]->h);
 	buttons[EXIT_BUTTON] = new Button(EXIT_BUTTON,buttonsTexture[EXIT_BUTTON]->w/2, buttonsTexture[EXIT_BUTTON]->h);
-	//buttons[PAUSE_STATE_EXIT_BUTTON] = new Button(PAUSE_STATE_EXIT_BUTTON, Vector2D(312, 405), buttonsTexture[EXIT_BUTTON]->w, buttonsTexture[EXIT_BUTTON]->h);
 	buttons[PAUSE_BUTTON] = new Button(PAUSE_BUTTON,  buttonsTexture[PAUSE_BUTTON]->w/2, buttonsTexture[PAUSE_BUTTON]->h);
 	buttons[MENU_BUTTON] = new Button(MENU_BUTTON,  buttonsTexture[MENU_BUTTON]->w/2, buttonsTexture[MENU_BUTTON]->h);
 	buttons[FANCY_MAP_SEL_BUTTON] = new Button(FANCY_MAP_SEL_BUTTON,  buttonsTexture[FANCY_MAP_SEL_BUTTON]->w, buttonsTexture[FANCY_MAP_SEL_BUTTON]->h);
@@ -59,10 +58,8 @@ bool UIHandler::init() {
 
 bool UIHandler::loadButton(string filePath,Button_Type type)
 {
-	
-	buttonsTexture[type] = new SDL_Texture();
-
 	buttonsTexture[type] = IMG_LoadTexture(GraphicsHandler::instance().getRenderer(), filePath.c_str());
+	SDL_SetTextureBlendMode(buttonsTexture[type], SDL_BLENDMODE_BLEND);
 	if (buttonsTexture[type] == NULL) {
 		SDL_Log(filePath.c_str());
 		SDL_Log("Image could not be loaded!! SDL error: %s\n", SDL_GetError());
@@ -73,9 +70,8 @@ bool UIHandler::loadButton(string filePath,Button_Type type)
 bool UIHandler::loadText(string filePath, Text_Type type)
 {
 
-	textsTexture[type] = new SDL_Texture();
-
 	textsTexture[type] = IMG_LoadTexture(GraphicsHandler::instance().getRenderer(), filePath.c_str());
+	SDL_SetTextureBlendMode(textsTexture[type], SDL_BLENDMODE_BLEND);
 	if (textsTexture[type] == NULL) {
 		SDL_Log(filePath.c_str());
 		SDL_Log("Image could not be loaded!! SDL error: %s\n", SDL_GetError());
@@ -83,36 +79,76 @@ bool UIHandler::loadText(string filePath, Text_Type type)
 	}
 	return true;
 }
-
+//MENU
 void UIHandler::renderMenu()
 {
-	renderText(129, 50,PONG_LOGO);
-	renderButton(312, 300,PLAY_BUTTON);
-	renderButton(312, 355,EXIT_BUTTON);
+	setMenuLayout();
+	renderText(PONG_LOGO);
+	renderButton(PLAY_BUTTON);
+	renderButton(EXIT_BUTTON);
 }
 
+void UIHandler::setMenuLayout()
+{
+	texts[PONG_LOGO]->x = 129;
+	texts[PONG_LOGO]->y = 50;
+
+	buttons[PLAY_BUTTON]->x = 312;
+	buttons[PLAY_BUTTON]->y = 300;
+
+	buttons[EXIT_BUTTON]->x = 312;
+	buttons[EXIT_BUTTON]->y = 355;
+}
+//PAUSE
 void UIHandler::renderPause()
 {
-	renderText(325, 50,PAUSE_TEXT);
-	renderButton(312, 300,PLAY_BUTTON);
-	renderButton(312, 355,MENU_BUTTON);
-	renderButton(312, 410,EXIT_BUTTON);
+
+	setPauseLayout();
+	renderText(PAUSE_TEXT);
+	renderButton(PLAY_BUTTON);
+	renderButton(MENU_BUTTON);
+	renderButton(EXIT_BUTTON);
 }
 
+void UIHandler::setPauseLayout()
+{
+	texts[PAUSE_TEXT]->x = 325;
+	texts[PAUSE_TEXT]->y = 50;
+
+	buttons[PLAY_BUTTON]->x = 312;
+	buttons[PLAY_BUTTON]->y = 300;
+
+	buttons[MENU_BUTTON]->x = 312;
+	buttons[MENU_BUTTON]->y = 355;
+
+	buttons[EXIT_BUTTON]->x = 312;
+	buttons[EXIT_BUTTON]->y = 410;
+}
+// SELECT MAP MODE
 void UIHandler::renderModeSelect()
 {
-	renderText(200,50,MAP_MODE_SEL_TEXT);
-	renderButton(100,200,FANCY_MAP_SEL_BUTTON);
-	renderButton(500,200,CLASSIC_MAP_SEL_BUTTON);
+	setSelModeLayout();
+	renderText(MAP_MODE_SEL_TEXT);
+	renderButton(FANCY_MAP_SEL_BUTTON);
+	renderButton(CLASSIC_MAP_SEL_BUTTON);
 }
+void UIHandler::setSelModeLayout()
+{
+	texts[MAP_MODE_SEL_TEXT]->x = 200;
+	texts[MAP_MODE_SEL_TEXT]->y = 50;
 
-void UIHandler::renderButton(int x,int y,Button_Type type)
+	buttons[FANCY_MAP_SEL_BUTTON]->x = 100;
+	buttons[FANCY_MAP_SEL_BUTTON]->y = 200;
+
+	buttons[CLASSIC_MAP_SEL_BUTTON]->x = 500;
+	buttons[CLASSIC_MAP_SEL_BUTTON]->y = 200;
+}
+//
+void UIHandler::renderButton(Button_Type type)
 {
 	SDL_Texture* tempButtonTex=buttonsTexture[type];
 	Button* tempButton = buttons[type];
 
-	tempButton->x = x;
-	tempButton->y = y;
 	int w = tempButton->width;
 	int h = tempButton->height;
 	SDL_FRect sourceRect, destRect;
@@ -123,26 +159,24 @@ void UIHandler::renderButton(int x,int y,Button_Type type)
 	sourceRect.h = h;
 	if (type != FANCY_MAP_SEL_BUTTON && type != CLASSIC_MAP_SEL_BUTTON)
 	{
-		if (InputHandler::Instance().mouseOverObject(x, y, w, h)) {
+		if (InputHandler::Instance().mouseOverObject(tempButton->x, tempButton->y, w, h)) {
 			//move to hover button
 			sourceRect.x = w;
 		}
 	}
-	destRect.x = x;
-	destRect.y = y;
+	destRect.x = tempButton->x;
+	destRect.y = tempButton->y;
 	destRect.w = sourceRect.w;
 	destRect.h = sourceRect.h;
 
 	SDL_RenderTexture(GraphicsHandler::instance().getRenderer(), tempButtonTex, &sourceRect, &destRect);
 }
 
-void UIHandler::renderText(int x,int y,Text_Type type)
+void UIHandler::renderText(Text_Type type)
 {
 	SDL_Texture* tempTextTex = textsTexture[type];
 	Text* tempText = texts[type];
 
-	tempText->x = x;
-	tempText->y = y;
 	int w = tempText->width;
 	int h = tempText->height;
 
@@ -153,8 +187,8 @@ void UIHandler::renderText(int x,int y,Text_Type type)
 	sourceRect.w = tempText->width;
 	sourceRect.h = tempText->height;
 
-	destRect.x = x;
-	destRect.y = y;
+	destRect.x = tempText->x;
+	destRect.y = tempText->y;
 	destRect.w = w ;
 	destRect.h = h;
 	
@@ -181,14 +215,15 @@ void UIHandler::clean()
 
 bool UIHandler::onButtonClicked(Button_Type type)
 {
-	Button* playButton = buttons[type];
+	Button* button = buttons[type];
+	if (!button) return false;
 
-	int x = playButton->x;
-	int y = playButton->y;
-	int w = playButton->width;
-	int h = playButton->height;
+	int x = button->x;
+	int y = button->y;
+	int w = button->width;
+	int h = button->height;
 
-	if (InputHandler::Instance().getMouseButtonState(LEFT) && InputHandler::Instance().mouseOverObject(x, y, w, h)) {
+	if (InputHandler::Instance().isMousePressedOnce(LEFT) && InputHandler::Instance().mouseOverObject(x, y, w, h)) {
 		return true;
 	}
 	return false;

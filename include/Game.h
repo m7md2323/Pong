@@ -42,9 +42,4 @@ protected:
 	~Game();
 private:
 
-	vector<vector<vector<Uint8>>> storeImageAsMatrix(string filePath);
-	//Game objects:
-	//2 Paddles
-	//and one ball (singleton instance)
-
 };

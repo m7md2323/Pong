@@ -6,7 +6,7 @@ using namespace std;
 class GameStateMachine
 {
 public:
-	static GameState* topState() {if(!gameStates.empty())return gameStates.top(); };
+	static GameState* topState() { if (gameStates.empty())return nullptr; return gameStates.top();};
 	static void pushState(GameState* state);
 	static void changeState(GameState* state);
 	static void popState();

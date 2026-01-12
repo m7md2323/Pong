@@ -21,43 +21,6 @@ Game::~Game()
 {
 	clean();
 }
-//this function is not used yet, I think its just cool function.
-vector<vector<vector<Uint8>>> Game::storeImageAsMatrix(string filePath)
-{
-	SDL_Surface* tempCopy = IMG_Load(filePath.c_str());
-	//creates a 3D matrix to store the pixels values RGBA
-	//A image.h X image.w X 4 3D matrix
-	vector<vector<vector<Uint8>>> imageMatrix(tempCopy->h, vector<vector<Uint8>>(tempCopy->w, vector<Uint8>(4)));
-	for (int i = 0; i < tempCopy->h; ++i) {
-		for (int j = 0; j < tempCopy->w; ++j) {
-			imageMatrix[i][j][0] = 0; // Initialize
-			imageMatrix[i][j][1] = 0;
-			imageMatrix[i][j][2] = 0;
-			imageMatrix[i][j][3] = 0;
-		}
-	}
-	SDL_LockSurface(tempCopy);
-
-	for (int i = 0; i < tempCopy->h; ++i) {
-		for (int j = 0; j < tempCopy->w; ++j) {
-			// Get the color at (x, y)
-			Uint32 pixelColor = *(Uint32*)((Uint8*)tempCopy->pixels + i * tempCopy->pitch + j * SDL_GetPixelFormatDetails(tempCopy->format)->bytes_per_pixel);
-
-			// Convert to RGBA
-			SDL_Color color;
-			SDL_GetRGBA(pixelColor, SDL_GetPixelFormatDetails(tempCopy->format), NULL, &color.r, &color.g, &color.b, &color.a);
-
-			// Store in your matrix
-			imageMatrix[i][j][0] = color.r;
-			imageMatrix[i][j][1] = color.g;
-			imageMatrix[i][j][2] = color.b;
-			imageMatrix[i][j][3] = color.a;
-		}
-	}
-	SDL_UnlockSurface(tempCopy);
-	return imageMatrix;
-}
-
 
 bool Game::init()
 {
@@ -71,6 +34,8 @@ bool Game::init()
 		SDL_Log("initializing user interface went wrong SDL error: %s\n", SDL_GetError());
 		return false;
 	}
+	InputHandler::Instance().init();
+
 	GameStateMachine::pushState(new MenuState());
 	// if everything went right, return true 
 	return true;
@@ -83,7 +48,6 @@ void Game::inputHandler()
 		case MENU:
 			if (UIHandler::instance().onButtonClicked(PLAY_BUTTON)) {
 				GameStateMachine::changeState(new SelectState());
-				SDL_Delay(250);
 			}
 			else if (UIHandler::instance().onButtonClicked(EXIT_BUTTON)) {
 				InputHandler::Instance().exit();
@@ -102,7 +66,6 @@ void Game::inputHandler()
 			}
 			else if (UIHandler::instance().onButtonClicked(MENU_BUTTON)) {
 				GameStateMachine::changeState(new MenuState());
-				SDL_Delay(500);
 			}
 			else if (UIHandler::instance().onButtonClicked(EXIT_BUTTON)) {
 				InputHandler::Instance().exit();
