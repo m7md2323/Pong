@@ -18,7 +18,9 @@ enum Button_Type {
 enum Text_Type {
 	PONG_LOGO,
 	MAP_MODE_SEL_TEXT,
-	PAUSE_TEXT
+	PAUSE_TEXT,
+	LEFT_PLAYER_WINNER,
+	RIGHT_PLAYER_WINNER
 };
 struct Text {
 	Text(Text_Type _type, int _width, int _height) :x{ 0 }, y{0},textType { _type }, width{ _width }, height{ _height } {
@@ -51,10 +53,12 @@ public:
 	void renderMenu();
 	void renderPause();
 	void renderModeSelect();
+	void renderWin(Text_Type);
 
 	void setMenuLayout();
 	void setPauseLayout();
 	void setSelModeLayout();
+	void setWinLayout();
 
 	void renderButton(Button_Type);
 	void renderText(Text_Type);

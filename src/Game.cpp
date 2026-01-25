@@ -59,6 +59,9 @@ void Game::inputHandler()
 			if (InputHandler::Instance().isKeyDown(SDL_SCANCODE_ESCAPE)|| UIHandler::instance().onButtonClicked(PAUSE_BUTTON)) {
 				GameStateMachine::pushState(new PauseState());
 			}
+			if (PlayState::whoWon!=NO_ONE) {
+				GameStateMachine::changeState(new WinState());
+			}
 			break;
 		case PAUSE:
 			if (UIHandler::instance().onButtonClicked(PLAY_BUTTON)) {
@@ -80,6 +83,21 @@ void Game::inputHandler()
 			else if (UIHandler::instance().onButtonClicked(CLASSIC_MAP_SEL_BUTTON)) {
 				PlayState::setMapMode(CLASSIC);
 				GameStateMachine::changeState(new PlayState());
+			}
+			break;
+		case WIN:
+			if (UIHandler::instance().onButtonClicked(PLAY_BUTTON)) {
+				GameStateMachine::changeState(new PlayState());
+				PlayState::whoWon = NO_ONE;
+			}
+			else if (UIHandler::instance().onButtonClicked(MENU_BUTTON)) {
+				GameStateMachine::changeState(new MenuState());
+				PlayState::whoWon = NO_ONE;
+			}
+			else if (UIHandler::instance().onButtonClicked(EXIT_BUTTON)) {
+				InputHandler::Instance().exit();
+				PlayState::whoWon = NO_ONE;
+				return;
 			}
 			break;
 		default:break;

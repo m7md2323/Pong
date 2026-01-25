@@ -74,11 +74,10 @@ bool GraphicsHandler::init(int _windowWidth, int _windowHeight)
 	//initialize Media and Graphics
 	if (loadMedia("../assets/theBall.png","classicBall") == false ||
 		loadMedia("../assets/fancy-ball.png", "fancyBall") == false ||
-		loadMedia("../assets/0To9_Score(1).png", "score")==false ||
+		loadMedia("../assets/0To9_Score.png", "score")==false ||
 		loadMedia("../assets/fancy-court.png", "fancyMap") == false ||
-		loadMedia("../assets/fancy-paddle-blue1.png", "fancyPaddle") == false||
-		loadMedia("../assets/PlayButton.png","playButton")==false||
-		loadMedia("../assets/PONG.png", "PONG") == false
+		loadMedia("../assets/fancy-paddle-blue.png", "fancyPaddle") == false||
+		loadMedia("../assets/PlayButton.png","playButton")==false
 		)
 
 	{

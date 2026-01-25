@@ -11,8 +11,8 @@ void PauseState::render() {
 	UIHandler::instance().renderPause();
 }
 bool PauseState::onEnter() {
-
+	UIHandler::instance().setPauseLayout();
 	cout << "Entering Pause state\n";
-	return false;
+	return true;
 }
 bool PauseState::onExit() { return false; }

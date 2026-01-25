@@ -1,6 +1,8 @@
 #include"PlayState.h"
 const Game_State PlayState::playID = PLAYING;
 Map_Mode PlayState::mapModeState;
+Winner PlayState::whoWon = NO_ONE;
+
 PlayState::PlayState():leftPlayer{ NULL }, rightPlayer{ NULL }
 {
 	leftPlayer = new Paddle(40, GraphicsHandler::instance().getWindowHeight() / 2, "left");
@@ -24,6 +26,7 @@ void PlayState::render() {
 bool PlayState::onEnter()
 {
 	Ball::instance().resetBall();
+	cout << "Entering Play state!!\n";
 	return true;
 }
 void PlayState::init()
@@ -37,14 +40,16 @@ bool PlayState::onExit()
 }
 
 void PlayState::update() {
+	if (leftPlayer->getScore() == 10)whoWon = LEFT_PLAYER;
+	if (rightPlayer->getScore() == 10)whoWon = RIGHT_PLAYER;
+
 	Ball::instance().update(leftPlayer, rightPlayer);
+
 	leftPlayer->update();
 	rightPlayer->update();
 }
 void PlayState::clean() {
 	//to avoid memory leaks
-	leftPlayer->clean();
-	rightPlayer->clean();
 	delete leftPlayer;
 	delete rightPlayer;
 	//to avoid dangling pointers

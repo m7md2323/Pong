@@ -18,10 +18,6 @@ bool UIHandler::init() {
 		SDL_Log("Media ClassicMap could not be loaded ! SDL error: %s\n", SDL_GetError());
 		return false;
 	}
-	if (!loadButton("../assets/PauseButton.png", PAUSE_BUTTON)) {
-		SDL_Log("Media PauseButton could not be loaded ! SDL error: %s\n", SDL_GetError());
-		return false;
-	}
 	if (!loadButton("../assets/MenuButton.png", MENU_BUTTON)) {
 		SDL_Log("Media MenuButton could not be loaded ! SDL error: %s\n", SDL_GetError());
 		return false;
@@ -39,10 +35,18 @@ bool UIHandler::init() {
 		SDL_Log("Media PauseTxt could not be loaded ! SDL error: %s\n", SDL_GetError());
 		return false;
 	}
+	if (!loadText("../assets/LeftPLayerWinnerTxt.png", LEFT_PLAYER_WINNER)) {
+		SDL_Log("Media PauseTxt could not be loaded ! SDL error: %s\n", SDL_GetError());
+		return false;
+	}
+	if (!loadText("../assets/RightPLayerWinnerTxt.png",RIGHT_PLAYER_WINNER)) {
+		SDL_Log("Media PauseTxt could not be loaded ! SDL error: %s\n", SDL_GetError());
+		return false;
+	}
 	//init buttons objects
 	buttons[PLAY_BUTTON] = new Button(PLAY_BUTTON,  buttonsTexture[PLAY_BUTTON]->w/2, buttonsTexture[PLAY_BUTTON]->h);
 	buttons[EXIT_BUTTON] = new Button(EXIT_BUTTON,buttonsTexture[EXIT_BUTTON]->w/2, buttonsTexture[EXIT_BUTTON]->h);
-	buttons[PAUSE_BUTTON] = new Button(PAUSE_BUTTON,  buttonsTexture[PAUSE_BUTTON]->w/2, buttonsTexture[PAUSE_BUTTON]->h);
+	//buttons[PAUSE_BUTTON] = new Button(PAUSE_BUTTON,  buttonsTexture[PAUSE_BUTTON]->w/2, buttonsTexture[PAUSE_BUTTON]->h);
 	buttons[MENU_BUTTON] = new Button(MENU_BUTTON,  buttonsTexture[MENU_BUTTON]->w/2, buttonsTexture[MENU_BUTTON]->h);
 	buttons[FANCY_MAP_SEL_BUTTON] = new Button(FANCY_MAP_SEL_BUTTON,  buttonsTexture[FANCY_MAP_SEL_BUTTON]->w, buttonsTexture[FANCY_MAP_SEL_BUTTON]->h);
 	buttons[CLASSIC_MAP_SEL_BUTTON] = new Button(CLASSIC_MAP_SEL_BUTTON, buttonsTexture[CLASSIC_MAP_SEL_BUTTON]->w, buttonsTexture[CLASSIC_MAP_SEL_BUTTON]->h);
@@ -51,6 +55,9 @@ bool UIHandler::init() {
 	texts[PONG_LOGO] = new Text(PONG_LOGO, textsTexture[PONG_LOGO]->w, textsTexture[PONG_LOGO]->h);
 	texts[MAP_MODE_SEL_TEXT] = new Text(MAP_MODE_SEL_TEXT, textsTexture[MAP_MODE_SEL_TEXT]->w, textsTexture[MAP_MODE_SEL_TEXT]->h);
 	texts[PAUSE_TEXT] = new Text(PAUSE_TEXT, textsTexture[PAUSE_TEXT]->w, textsTexture[PAUSE_TEXT]->h);
+	texts[LEFT_PLAYER_WINNER] = new Text(LEFT_PLAYER_WINNER, textsTexture[LEFT_PLAYER_WINNER]->w, textsTexture[LEFT_PLAYER_WINNER]->h);
+	texts[RIGHT_PLAYER_WINNER] = new Text(RIGHT_PLAYER_WINNER, textsTexture[RIGHT_PLAYER_WINNER]->w, textsTexture[RIGHT_PLAYER_WINNER]->h);
+
 
 	return true;
 
@@ -82,7 +89,6 @@ bool UIHandler::loadText(string filePath, Text_Type type)
 //MENU
 void UIHandler::renderMenu()
 {
-	setMenuLayout();
 	renderText(PONG_LOGO);
 	renderButton(PLAY_BUTTON);
 	renderButton(EXIT_BUTTON);
@@ -102,8 +108,6 @@ void UIHandler::setMenuLayout()
 //PAUSE
 void UIHandler::renderPause()
 {
-
-	setPauseLayout();
 	renderText(PAUSE_TEXT);
 	renderButton(PLAY_BUTTON);
 	renderButton(MENU_BUTTON);
@@ -127,22 +131,50 @@ void UIHandler::setPauseLayout()
 // SELECT MAP MODE
 void UIHandler::renderModeSelect()
 {
-	setSelModeLayout();
 	renderText(MAP_MODE_SEL_TEXT);
 	renderButton(FANCY_MAP_SEL_BUTTON);
 	renderButton(CLASSIC_MAP_SEL_BUTTON);
 }
+
 void UIHandler::setSelModeLayout()
 {
 	texts[MAP_MODE_SEL_TEXT]->x = 200;
 	texts[MAP_MODE_SEL_TEXT]->y = 50;
 
-	buttons[FANCY_MAP_SEL_BUTTON]->x = 100;
-	buttons[FANCY_MAP_SEL_BUTTON]->y = 200;
+	buttons[FANCY_MAP_SEL_BUTTON]->x = 50;
+	buttons[FANCY_MAP_SEL_BUTTON]->y = 250;
 
 	buttons[CLASSIC_MAP_SEL_BUTTON]->x = 500;
-	buttons[CLASSIC_MAP_SEL_BUTTON]->y = 200;
+	buttons[CLASSIC_MAP_SEL_BUTTON]->y = 250;
 }
+//WIN
+void UIHandler::setWinLayout()
+{
+	texts[LEFT_PLAYER_WINNER]->x = 177;
+	texts[LEFT_PLAYER_WINNER]->y = 80;
+
+	texts[RIGHT_PLAYER_WINNER]->x = 177;
+	texts[RIGHT_PLAYER_WINNER]->y = 80;
+
+	buttons[PLAY_BUTTON]->x = 312;
+	buttons[PLAY_BUTTON]->y = 310;
+
+	buttons[MENU_BUTTON]->x = 312;
+	buttons[MENU_BUTTON]->y = 365;
+
+	buttons[EXIT_BUTTON]->x = 312;
+	buttons[EXIT_BUTTON]->y = 420;
+}
+
+void UIHandler::renderWin(Text_Type text)
+{
+
+	renderText(text);
+	renderButton(PLAY_BUTTON);
+	renderButton(MENU_BUTTON);
+	renderButton(EXIT_BUTTON);
+}
+
 //
 void UIHandler::renderButton(Button_Type type)
 {

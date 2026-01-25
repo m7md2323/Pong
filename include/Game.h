@@ -20,7 +20,7 @@
 #include"PlayState.h"
 #include"PauseState.h"
 #include"UIHandler.h"
-
+#include"WinState.h"
 using namespace std;
 //this class instance is created using the Meyers’ singleton creational design pattern 
 class Game {

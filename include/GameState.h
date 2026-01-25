@@ -9,6 +9,7 @@ enum Game_State {
 	PAUSE,
 	MODE_SELECTING,
 	PLAYING,
+	WIN,
 	EXIT
 };
 class GameState

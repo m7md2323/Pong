@@ -160,6 +160,7 @@
     <ClCompile Include="..\src\PlayState.cpp" />
     <ClCompile Include="..\src\UIHandler.cpp" />
     <ClCompile Include="..\src\Vector2D.cpp" />
+    <ClCompile Include="..\src\WinState.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Ball.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="..\include\PlayState.h" />
     <ClInclude Include="..\include\UIHandler.h" />
     <ClInclude Include="..\include\Vector2D.h" />
+    <ClInclude Include="..\include\WinState.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

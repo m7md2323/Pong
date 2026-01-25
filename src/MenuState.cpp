@@ -13,13 +13,13 @@ void MenuState::render() {
 	//GraphicsHandler::instance().renderButton(EXIT_BUTTON);
 }
 bool MenuState::onEnter() { 
-	
+	UIHandler::instance().setMenuLayout();
 	cout << "Entering Menu state\n";
 	return false; 
 }
 bool MenuState::onExit() { return false; }
 
-///////////////////////////////////////////////////////////////
+///////////////////////////Select state methods////////////////////////////////////
 void SelectState::update() {
 	//GraphicsHandler::instance().renderButton(PLAY_BUTTON,200,50);
 	//GraphicsHandler::instance().renderButton(EXIT_BUTTON);
@@ -31,7 +31,7 @@ void SelectState::render() {
 	//GraphicsHandler::instance().renderButton(EXIT_BUTTON);
 }
 bool SelectState::onEnter() {
-
+	UIHandler::instance().setSelModeLayout();
 	cout << "Entering Select state state\n";
 	return false;
 }
